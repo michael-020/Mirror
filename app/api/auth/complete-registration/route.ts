@@ -47,7 +47,8 @@ export async function POST(req: NextRequest){
                 email, 
                 username,
                 name,
-                password: null
+                password: null,
+                provider: "google"
             }
         })
 

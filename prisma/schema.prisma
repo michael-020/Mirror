@@ -18,6 +18,7 @@ model User {
   id          String    @unique   @id   @default(uuid())
   name        String    
   username    String    @unique
+  email       String    @unique
   password    String?      
   items       Item[]
   provider    String    @default("credentials")
