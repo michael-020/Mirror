@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "./app/generated/prisma"
 }
 
 datasource db {
@@ -25,4 +26,12 @@ model Admin {
   adminId    String   @unique   
   password   String   
   createdAt  DateTime  @default(now())
+}
+
+model OTP {
+  id          String    @unique   @id     @default(uuid())
+  email       String    @unique
+  otp         String
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime  
 }

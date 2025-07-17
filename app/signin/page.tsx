@@ -1,27 +1,59 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import Link from "next/link";
+import { useSearchParams, useRouter, redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [clientError, setClientError] = useState<string>("");
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
+  const { data: session } = useSession()
 
+  useEffect(() => {
+    if(session)
+      redirect("/")
+  }, [session])
+ 
   const error = searchParams.get("error");
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
+  // Decode the callback URL for display
+  const decodedCallbackUrl = decodeURIComponent(callbackUrl);
+
+  // Handle both URL params errors and client-side errors
   let errorMessage = "";
-  if (error === "CredentialsSignin") {
+  if (clientError) {
+    errorMessage = clientError;
+  } else if (error === "CredentialsSignin") {
     errorMessage = "Invalid email or password.";
+  } else if (error === "OAuthSignin") {
+    errorMessage = "Error with OAuth provider. Please try again.";
+  } else if (error === "OAuthCallback") {
+    errorMessage = "Error in OAuth callback. Please try again.";
+  } else if (error === "OAuthCreateAccount") {
+    errorMessage = "Could not create OAuth account. Please try again.";
+  } else if (error === "EmailCreateAccount") {
+    errorMessage = "Could not create account with that email address.";
+  } else if (error === "Callback") {
+    errorMessage = "Error in callback. Please try again.";
+  } else if (error === "OAuthAccountNotLinked") {
+    errorMessage = "Account not linked. Please use the same method you used to sign up.";
+  } else if (error === "EmailSignin") {
+    errorMessage = "Check your email for the sign in link.";
+  } else if (error === "CredentialsSignup") {
+    errorMessage = "Error creating account. Please try again.";
+  } else if (error === "SessionRequired") {
+    errorMessage = "Please sign in to access this page.";
   } else if (error) {
-    errorMessage = "An unexpected error occurred.";
+    errorMessage = `Authentication error: ${error}`;
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,27 +62,39 @@ export default function SignInPage() {
       ...prev,
       [name]: value
     }));
+    // Clear error when user starts typing
+    if (clientError) {
+      setClientError("");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setClientError(""); // Clear any previous errors
 
     try {
       const result = await signIn("credentials", {
         email: formData.email,
         password: formData.password,
         redirect: false,
-        callbackUrl
+        callbackUrl: decodedCallbackUrl
       });
 
       if (result?.error) {
         console.error("Sign in error:", result.error);
+        // Handle the error client-side
+        if (result.error === "CredentialsSignin") {
+          setClientError("Invalid email or password.");
+        } else {
+          setClientError("An error occurred during sign in. Please try again.");
+        }
       } else if (result?.ok) {
-        router.push(callbackUrl);
+        router.push(decodedCallbackUrl);
       }
     } catch (error) {
       console.error("Sign in error:", error);
+      setClientError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -135,11 +179,11 @@ export default function SignInPage() {
           </div>
 
           <button
-            onClick={() => signIn("google", { callbackUrl })}
+            onClick={() => signIn("google", { callbackUrl: decodedCallbackUrl })}
             disabled={isLoading}
-            className="mt-6 w-full bg-white hover:bg-gray-50 space-x-3 text-gray-700 font-medium py-3 px-4 border border-gray-300 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center"
+            className="mt-6 w-full space-x-3 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 border border-gray-300 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center"
           >
-            <Image alt="google-image" src={"google.svg"} width={25} height={25} />
+            <Image alt="google-image" src={"./google.svg"} width={25} height={25} />
             <p>
               Continue with Google
             </p>
@@ -148,10 +192,10 @@ export default function SignInPage() {
 
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
-            Don&#39;t have an account?{" "}
-            <a href="/signup" className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200">
+            Don&apos;t have an account?{" "}
+            <Link href="/verify-email" className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>
