@@ -124,6 +124,7 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
   password: 'password',
+  provider: 'provider',
   createdAt: 'createdAt'
 };
 
@@ -156,7 +157,10 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.AUTHOPTIONS = exports.$Enums.AUTHOPTIONS = {
+  GOOGLE: 'GOOGLE',
+  CREDENTIALS: 'CREDENTIALS'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',

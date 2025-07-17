@@ -15,10 +15,11 @@ datasource db {
 }
 
 model User {
-  id        String   @id @unique @default(uuid())
-  email     String   @unique
+  id        String      @id @unique @default(uuid())
+  email     String      @unique
   password  String?
-  createdAt DateTime @default(now())
+  provider  AUTHOPTIONS @default(CREDENTIALS)
+  createdAt DateTime    @default(now())
 }
 
 model Admin {
@@ -34,4 +35,9 @@ model OTP {
   otp       String
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+enum AUTHOPTIONS {
+  GOOGLE
+  CREDENTIALS
 }

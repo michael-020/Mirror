@@ -15,7 +15,11 @@ export default async function Home() {
       <pre>{JSON.stringify(session)}</pre>
       <h2>Client Call</h2>
       <User />
-
+      <div className='bg-amber-200 select-none border rounded-full size-12 p-2 flex items-center justify-center'>
+        <div className='text-xl'>
+          {(session?.user?.email as string).toString()[0].toUpperCase()}
+        </div>
+      </div>
       <br />
       <br />
       <Link href={"/profile"}>

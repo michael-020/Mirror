@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google"
 import bcrypt from "bcrypt"
 import { AuthOptions } from "next-auth";
+import { AUTHOPTIONS } from "@/prisma/app/generated/prisma";
 
 export const authOptions: AuthOptions = NextAuth({
   providers: [
@@ -56,13 +57,54 @@ export const authOptions: AuthOptions = NextAuth({
         }
       }
       return token
-    }
+    }, 
+async signIn({ account, profile }) {
+      try {
+        if (!profile?.email) {
+          return false;
+        }
+
+        if (account?.provider === "google") {
+          const existingUser = await prisma.user.findUnique({
+            where: {
+              email: profile.email
+            }
+          });
+
+          if (!existingUser) {
+            await prisma.user.upsert({
+  where: {
+    email: profile.email, // Unique field (must be marked as @unique in schema)
+  },
+  update: {
+    provider: AUTHOPTIONS.GOOGLE, // What to update if user already exists
+  },
+  create: {
+    email: profile.email,
+    provider: AUTHOPTIONS.GOOGLE, // What to insert if user doesn't exist
+  },
+});
+
+            return true;
+          }
+
+          // Check if the existing user was created with Google
+          return existingUser.provider === AUTHOPTIONS.GOOGLE;
+        }
+
+        return true;
+      } catch (error) {
+        console.error("Error in signIn callback:", error);
+        return false;
+      }
+    },
   },
   session: {
     strategy: "jwt"
   },
   pages: {
-    signIn: "/signin"
+    signIn: "/signin",
+    error: '/auth/error'
   },
   secret: process.env.AUTH_SECRET
 })
