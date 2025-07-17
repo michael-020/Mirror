@@ -22,7 +22,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     if(session)
-        redirect("/")
+        redirect("/home")
   }, [session])
 
   const handleSendOtp = async (e: React.FormEvent) => {

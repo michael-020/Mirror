@@ -20,16 +20,14 @@ export default function SignInPage() {
 
   useEffect(() => {
     if(session)
-      redirect("/")
+      redirect("/home")
   }, [session])
  
   const error = searchParams.get("error");
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-  // Decode the callback URL for display
   const decodedCallbackUrl = decodeURIComponent(callbackUrl);
 
-  // Handle both URL params errors and client-side errors
   let errorMessage = "";
   if (clientError) {
     errorMessage = clientError;
