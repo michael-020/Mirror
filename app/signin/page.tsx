@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, useRouter, redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
@@ -136,16 +137,14 @@ export default function SignInPage() {
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
-              placeholder="Enter your password"
               value={formData.password}
               onChange={handleInputChange}
-              required
+              placeholder="Enter your password"
               disabled={isLoading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:cursor-not-allowed"
+              required
             />
           </div>
 

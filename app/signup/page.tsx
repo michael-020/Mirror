@@ -7,6 +7,7 @@ import { signIn, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export default function SignUpPage() {
   const { inputEmail } = useAuthStore()
@@ -106,16 +107,14 @@ export default function SignUpPage() {
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
-              placeholder="Create a password"
               value={formData.password}
               onChange={handleInputChange}
-              required
+              placeholder="Create a password"
               disabled={isLoading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:cursor-not-allowed"
+              required
             />
           </div>
 
@@ -123,16 +122,14 @@ export default function SignUpPage() {
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
               Confirm Password
             </label>
-            <input
+            <PasswordInput
               id="confirmPassword"
               name="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
               value={formData.confirmPassword}
               onChange={handleInputChange}
-              required
+              placeholder="Confirm your password"
               disabled={isLoading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:cursor-not-allowed"
+              required
             />
           </div>
 
@@ -150,7 +147,7 @@ export default function SignUpPage() {
                 Creating Account...
               </div>
             ) : (
-              "Sign Up"
+              "Create Account"
             )}
           </button>
         </form>
