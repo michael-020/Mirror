@@ -6,54 +6,32 @@ import Link from "next/link";
 import { useSearchParams, useRouter, redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PasswordInput } from "@/components/PasswordInput";
+import { getAuthErrorMessage } from "@/utils/authErrors";
+import toast from "react-hot-toast";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [clientError, setClientError] = useState<string>("");
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
-  const { data: session } = useSession()
+  const { data: session } = useSession();
 
   useEffect(() => {
-    if(session)
-      redirect("/home")
-  }, [session])
+    if(session) {
+      redirect("/home");
+    }
+
+    const error = searchParams.get("error");
+    if (error) {
+      toast.error(getAuthErrorMessage(error));
+    }
+  }, [session]);
  
-  const error = searchParams.get("error");
   const callbackUrl = searchParams.get("callbackUrl") || "/";
-
   const decodedCallbackUrl = decodeURIComponent(callbackUrl);
-
-  let errorMessage = "";
-  if (clientError) {
-    errorMessage = clientError;
-  } else if (error === "CredentialsSignin") {
-    errorMessage = "Invalid email or password.";
-  } else if (error === "OAuthSignin") {
-    errorMessage = "Error with OAuth provider. Please try again.";
-  } else if (error === "OAuthCallback") {
-    errorMessage = "Error in OAuth callback. Please try again.";
-  } else if (error === "OAuthCreateAccount") {
-    errorMessage = "Could not create OAuth account. Please try again.";
-  } else if (error === "EmailCreateAccount") {
-    errorMessage = "Could not create account with that email address.";
-  } else if (error === "Callback") {
-    errorMessage = "Error in callback. Please try again.";
-  } else if (error === "OAuthAccountNotLinked") {
-    errorMessage = "Account not linked. Please use the same method you used to sign up.";
-  } else if (error === "EmailSignin") {
-    errorMessage = "Check your email for the sign in link.";
-  } else if (error === "CredentialsSignup") {
-    errorMessage = "Error creating account. Please try again.";
-  } else if (error === "SessionRequired") {
-    errorMessage = "Please sign in to access this page.";
-  } else if (error) {
-    errorMessage = `Authentication error: ${error}`;
-  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -61,16 +39,11 @@ export default function SignInPage() {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
-    if (clientError) {
-      setClientError("");
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setClientError(""); // Clear any previous errors
 
     try {
       const result = await signIn("credentials", {
@@ -82,18 +55,13 @@ export default function SignInPage() {
 
       if (result?.error) {
         console.error("Sign in error:", result.error);
-        // Handle the error client-side
-        if (result.error === "CredentialsSignin") {
-          setClientError("Invalid email or password.");
-        } else {
-          setClientError("An error occurred during sign in. Please try again.");
-        }
+        toast.error(getAuthErrorMessage(result.error));
       } else if (result?.ok) {
         router.push(decodedCallbackUrl);
       }
     } catch (error) {
       console.error("Sign in error:", error);
-      setClientError("An unexpected error occurred. Please try again.");
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -106,12 +74,6 @@ export default function SignInPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
-
-        {errorMessage && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm font-medium">{errorMessage}</p>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

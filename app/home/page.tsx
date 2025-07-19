@@ -3,12 +3,15 @@ import { User } from '@/components/user'
 import { LoginButton, LogoutButton } from '@/components/auth'
 import Link from 'next/link'
 import { authOptions } from '../api/auth/[...nextauth]/route'
+import { redirect } from 'next/navigation'
 
 export default async function Home() {
   const session = await getServerSession(authOptions)
+  if(!session)
+    redirect("/")
 
   return (
-    <main className='p-4 space-y-4'>
+    <main className='p-4 bg-neutral-700 h-screen text-white space-y-4'>
       <LoginButton />
       <LogoutButton  />
       <h2>Server Session</h2>

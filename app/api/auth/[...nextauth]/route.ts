@@ -58,43 +58,35 @@ export const authOptions: AuthOptions = NextAuth({
       }
       return token
     }, 
-async signIn({ account, profile }) {
+    async signIn({ account, profile }) {
       try {
         if (!profile?.email) {
+          console.error("No email provided by Google");
           return false;
         }
 
         if (account?.provider === "google") {
-          const existingUser = await prisma.user.findUnique({
+          await prisma.user.upsert({
             where: {
-              email: profile.email
-            }
+              email: profile.email,
+            },
+            update: {
+              provider: AUTHOPTIONS.GOOGLE,
+            },
+            create: {
+              email: profile.email,
+              provider: AUTHOPTIONS.GOOGLE,
+            },
           });
-
-          if (!existingUser) {
-            await prisma.user.upsert({
-  where: {
-    email: profile.email, // Unique field (must be marked as @unique in schema)
-  },
-  update: {
-    provider: AUTHOPTIONS.GOOGLE, // What to update if user already exists
-  },
-  create: {
-    email: profile.email,
-    provider: AUTHOPTIONS.GOOGLE, // What to insert if user doesn't exist
-  },
-});
-
-            return true;
-          }
-
-          // Check if the existing user was created with Google
-          return existingUser.provider === AUTHOPTIONS.GOOGLE;
+          return true
         }
 
-        return true;
+        return false;
       } catch (error) {
         console.error("Error in signIn callback:", error);
+        if (error instanceof Error) {
+          console.error(`Error type: ${error.name}, Message: ${error.message}`);
+        }
         return false;
       }
     },
