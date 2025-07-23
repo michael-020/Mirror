@@ -1,6 +1,6 @@
 "use client";
 
-import { AxiosInstance } from "@/lib/axios";
+import { axiosInstance } from "@/lib/axios";
 import { useAuthStore } from "@/stores/authStore/useAuthStore";
 import { AxiosError } from "axios";
 import { signIn, useSession } from "next-auth/react";
@@ -49,7 +49,7 @@ export default function SignUpPage() {
     }
 
     try {
-      await AxiosInstance.post("/api/auth/signup", {
+      await axiosInstance.post("/api/auth/signup", {
           email: inputEmail,
           password: formData.password
       });

@@ -1,7 +1,7 @@
 "use client"
 
 import { create } from "zustand"
-import { StoreState } from "./types"
+import { BuildStep, StoreState } from "./types"
 
 export const useEditorStore = create<StoreState>((set, get) => ({
   // Initial state
@@ -12,9 +12,9 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   selectedFile: null,
 
   // Build actions
-  addBuildStep: (step) =>
+  setBuildSteps: (steps: BuildStep[]) =>
     set((state) => ({
-      buildSteps: [...state.buildSteps, step],
+      buildSteps: [...state.buildSteps, ...steps],
     })),
 
   clearBuildSteps: () => set({ buildSteps: [] }),

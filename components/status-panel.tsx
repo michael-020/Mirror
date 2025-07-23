@@ -1,61 +1,91 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
-import { CheckCircle, Clock, AlertCircle, Zap } from 'lucide-react'
+import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucide-react'
+import { axiosInstance } from "@/lib/axios"
+import { parseXml } from "@/lib/steps"
+import { BuildStep, statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
-  const { buildSteps, isBuilding, addBuildStep } = useStore()
+  const { buildSteps, isBuilding, setBuildSteps } = useStore()
+  const [prompt, setPrompt] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    if (!isBuilding) return
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!prompt.trim()) return
 
-    const steps = [
-      "Initializing project workspace...",
-      "Analyzing project requirements...",
-      "Installing dependencies...",
-      "Setting up TypeScript configuration...",
-      "Configuring Tailwind CSS...",
-      "Creating project structure...",
-      "Generating React components...",
-      "Setting up routing system...",
-      "Optimizing build configuration...",
-      "Build completed successfully!",
-    ]
+    setIsLoading(true)
+    
+    try {
+      const res = await axiosInstance.post("/api/template", {
+        prompt: prompt
+      })
 
-    let currentStep = 0
-    const interval = setInterval(() => {
-      if (currentStep < steps.length) {
-        addBuildStep({
-          id: Date.now() + currentStep,
-          message: steps[currentStep],
-          status: currentStep === steps.length - 1 ? "completed" : "in-progress",
-          timestamp: new Date(),
-        })
-        currentStep++
-      } else {
-        clearInterval(interval)
-      }
-    }, 1500)
+      const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0])
+      setBuildSteps(parsedSteps.map((x: BuildStep )=> ({
+        ...x,
+        status: statusType.Completed
+      })))
+      setPrompt("") 
+    } catch (error) {
+      console.error("Error generating steps:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-    return () => clearInterval(interval)
-  }, [isBuilding, addBuildStep])
+  // useEffect(() => {
+  //   if (!isBuilding) return
 
-  const getStatusIcon = (status: string) => {
+  //   const steps = [
+  //     "Initializing project workspace...",
+  //     "Analyzing project requirements...",
+  //     "Installing dependencies...",
+  //     "Setting up TypeScript configuration...",
+  //     "Configuring Tailwind CSS...",
+  //     "Creating project structure...",
+  //     "Generating React components...",
+  //     "Setting up routing system...",
+  //     "Optimizing build configuration...",
+  //     "Build completed successfully!",
+  //   ]
+
+  //   let currentStep = 0
+  //   const interval = setInterval(() => {
+  //     if (currentStep < steps.length) {
+  //       addBuildStep({
+  //         id: Date.now() + currentStep,
+  //         description: steps[currentStep],
+  //         type: 
+  //         status: currentStep === steps.length - 1 ? "completed" : "in-progress",
+  //         timestamp: new Date(),
+  //       })
+  //       currentStep++
+  //     } else {
+  //       clearInterval(interval)
+  //     }
+  //   }, 1500)
+
+  //   return () => clearInterval(interval)
+  // }, [isBuilding, addBuildStep])
+
+  const getStatusIcon = (status: statusType) => {
     switch (status) {
-      case "completed":
+      case statusType.Completed:
         return <CheckCircle className="w-4 h-4 text-green-500" />
-      case "in-progress":
+      case statusType.InProgress:
         return <Clock className="w-4 h-4 text-yellow-500 animate-spin" />
-      case "error":
+      case statusType.Error:
         return <AlertCircle className="w-4 h-4 text-red-500" />
       default:
         return <Clock className="w-4 h-4 text-gray-500" />
     }
   }
 
-  const completedSteps = buildSteps.filter(step => step.status === "completed").length
+  const completedSteps = buildSteps.filter(step => step.status === statusType.Completed).length
   const totalSteps = buildSteps.length
   const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
 
@@ -83,7 +113,7 @@ export function StatusPanel() {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-auto p-4 space-y-2">
         {buildSteps.length === 0 && !isBuilding && (
           <div className="text-center py-8">
             <div className="text-gray-500 text-sm mb-2">Ready to build</div>
@@ -91,19 +121,13 @@ export function StatusPanel() {
           </div>
         )}
 
-        {buildSteps.map((step, index) => (
-          <div key={step.id} className="flex items-start gap-3 group">
+        {buildSteps.map((step) => (
+          <div key={step.id} className="flex items-start gap-3 py-0.5 group">
             {getStatusIcon(step.status)}
             <div className="flex-1 min-w-0">
               <p className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                {step.message}
+                {step.title}
               </p>
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-xs text-gray-500">{step.timestamp.toLocaleTimeString()}</p>
-                {step.status === "completed" && (
-                  <span className="text-xs text-green-400">✓ Done</span>
-                )}
-              </div>
             </div>
           </div>
         ))}
@@ -114,6 +138,36 @@ export function StatusPanel() {
             Building your website...
           </div>
         )}
+      </div>
+
+      <div className="border-t border-gray-700 p-4 bg-gray-800">
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <input
+            type="text"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Enter your next instruction..."
+            className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <button
+            type="submit"
+            disabled={!prompt.trim() || isLoading}
+            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
+              prompt.trim() && !isLoading
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-gray-600 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            {isLoading ? (
+             <Loader2 className="animate-spin" />
+            ) : (
+              <>
+                <span>Send</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </button>
+        </form>
       </div>
     </div>
   )

@@ -3,6 +3,9 @@
 import { useState } from "react"
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { axiosInstance } from "@/lib/axios"
+import { useEditorStore } from "@/stores/editorStore/useEditorStore"
+import { parseXml } from "@/lib/steps"
+import { BuildStep, statusType } from "@/stores/editorStore/types"
 
 interface ProjectInitializerProps {
   onSubmit: (description: string) => void
@@ -11,6 +14,7 @@ interface ProjectInitializerProps {
 export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
   const [description, setDescription] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const { setBuildSteps } = useEditorStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,14 +22,20 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
 
     setIsLoading(true)
     
-    await axiosInstance.post("/api/template", {
+    const res = await axiosInstance.post("/api/template", {
         prompt: description
     })
-    
+
+    const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0])
+
+    setBuildSteps(parsedSteps.map((x: BuildStep )=> ({
+      ...x,
+      status: statusType.Completed
+    })))
+
     onSubmit(description.trim())
     setIsLoading(false)
   }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">

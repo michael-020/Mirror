@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { redirect, useRouter } from "next/navigation";
 import Link from "next/link";
-import { AxiosInstance } from "@/lib/axios";
+import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
 import { useSession } from "next-auth/react";
@@ -31,7 +31,7 @@ export default function VerifyEmailPage() {
     setError("");
 
     try {
-        const res = await AxiosInstance.post("/api/auth/inititate-signup", {
+        const res = await axiosInstance.post("/api/auth/inititate-signup", {
             email
         });
 
@@ -57,7 +57,7 @@ export default function VerifyEmailPage() {
     setError("");
 
     try {
-      const res = await AxiosInstance.post("/api/auth/verify-email", {
+      const res = await axiosInstance.post("/api/auth/verify-email", {
         email,
         otp
       });
