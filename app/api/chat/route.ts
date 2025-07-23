@@ -1,5 +1,5 @@
-import { openai } from "@/lib/config";
 import { getSystemPrompt } from "@/lib/prompts";
+import { openai } from "@/lib/server/openai";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest){

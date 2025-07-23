@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { BASE_PROMPT } from "@/lib/prompts";
 import { basePrompt as reactBasePrompt } from "@/defaults/react";
 import { basePrompt as nodeBasePrompt } from "@/defaults/node";
-import { openai } from "@/lib/config";
-
+import { openai } from "@/lib/server/openai";
 
 export async function POST(req: NextRequest) {
     try {

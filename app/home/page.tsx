@@ -28,6 +28,12 @@ export default async function Home() {
       <Link href={"/profile"}>
         go to profile
       </Link>
+
+      <br />
+      <br />
+      <Link href={"/chat"}>
+        go to chat
+      </Link>
     </main>
   )
 }
