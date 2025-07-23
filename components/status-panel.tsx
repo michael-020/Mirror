@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
 import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucide-react'
 import { axiosInstance } from "@/lib/axios"
@@ -9,7 +9,7 @@ import { parseXml } from "@/lib/steps"
 import { BuildStep, statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
-  const { buildSteps, isBuilding, setBuildSteps } = useStore()
+  const { buildSteps, isBuilding, setBuildSteps, executeSteps } = useStore()
   const [prompt, setPrompt] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
@@ -24,11 +24,13 @@ export function StatusPanel() {
         prompt: prompt
       })
 
-      const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0])
-      setBuildSteps(parsedSteps.map((x: BuildStep )=> ({
+      const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0]).map((x: BuildStep) => ({
         ...x,
-        status: statusType.Completed
-      })))
+        status: statusType.InProgress
+      }))
+      
+      setBuildSteps(parsedSteps)
+      await executeSteps(parsedSteps)
       setPrompt("") 
     } catch (error) {
       console.error("Error generating steps:", error)
@@ -36,41 +38,6 @@ export function StatusPanel() {
       setIsLoading(false)
     }
   }
-
-  // useEffect(() => {
-  //   if (!isBuilding) return
-
-  //   const steps = [
-  //     "Initializing project workspace...",
-  //     "Analyzing project requirements...",
-  //     "Installing dependencies...",
-  //     "Setting up TypeScript configuration...",
-  //     "Configuring Tailwind CSS...",
-  //     "Creating project structure...",
-  //     "Generating React components...",
-  //     "Setting up routing system...",
-  //     "Optimizing build configuration...",
-  //     "Build completed successfully!",
-  //   ]
-
-  //   let currentStep = 0
-  //   const interval = setInterval(() => {
-  //     if (currentStep < steps.length) {
-  //       addBuildStep({
-  //         id: Date.now() + currentStep,
-  //         description: steps[currentStep],
-  //         type: 
-  //         status: currentStep === steps.length - 1 ? "completed" : "in-progress",
-  //         timestamp: new Date(),
-  //       })
-  //       currentStep++
-  //     } else {
-  //       clearInterval(interval)
-  //     }
-  //   }, 1500)
-
-  //   return () => clearInterval(interval)
-  // }, [isBuilding, addBuildStep])
 
   const getStatusIcon = (status: statusType) => {
     switch (status) {
@@ -90,7 +57,7 @@ export function StatusPanel() {
   const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-[94vh] flex flex-col">
       <div className="p-4 border-b border-gray-700">
         <div className="flex items-center gap-2 mb-2">
           <Zap className="w-4 h-4 text-blue-400" />
@@ -121,21 +88,23 @@ export function StatusPanel() {
           </div>
         )}
 
-        {buildSteps.map((step) => (
-          <div key={step.id} className="flex items-start gap-3 py-0.5 group">
-            {getStatusIcon(step.status)}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                {step.title}
-              </p>
+        {buildSteps
+          .filter(step => step.title !== "Project Files")
+          .map((step) => (
+            <div key={step.id} className="flex items-start gap-3 py-0.5 group">
+              {getStatusIcon(step.status)}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-300 group-hover:text-white transition-colors">
+                  {step.title}
+                </p>
+              </div>
             </div>
-          </div>
         ))}
 
-        {isBuilding && (
+        {isLoading && (
           <div className="flex items-center gap-2 text-xs text-blue-400 mt-4 p-2 bg-blue-900/20 rounded-md">
             <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-            Building your website...
+            Processing your request...
           </div>
         )}
       </div>

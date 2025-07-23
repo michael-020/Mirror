@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { StatusPanel } from "@/components/status-panel"
 import { FileExplorer } from "@/components/file-explorer"
 import { CodeEditor } from "@/components/code-editor"
@@ -13,7 +13,20 @@ export default function ChatPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showMainInterface, setShowMainInterface] = useState(false)
   const [projectDescription, setProjectDescription] = useState("")
-  const { isBuilding, startBuild, stopBuild } = useStore()
+  const { isBuilding, startBuild, stopBuild, setSelectedFile, fileItems, clearBuildSteps, setFileItems, setFiles } = useStore()
+
+  const hasSelectedInitialFile = useRef(false)
+
+  // Auto-select first file when files are created
+  useEffect(() => {
+    if (!hasSelectedInitialFile.current && fileItems.length > 0) {
+      const firstFile = fileItems.find(f => f.type === "file")
+      if (firstFile) {
+        setSelectedFile(firstFile.path)
+        hasSelectedInitialFile.current = true
+      }
+    }
+  }, [fileItems, setSelectedFile])
 
   const handleStartBuild = () => {
     if (isBuilding) {
@@ -31,6 +44,12 @@ export default function ChatPage() {
   const handleBackToInitializer = () => {
     setShowMainInterface(false)
     setProjectDescription("")
+    // Clear all build state
+    clearBuildSteps()
+    setFileItems([])
+    setFiles({})
+    setSelectedFile(null)
+    hasSelectedInitialFile.current = false
   }
 
   // Show project initializer if main interface is not active

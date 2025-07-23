@@ -14,7 +14,7 @@ interface ProjectInitializerProps {
 export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
   const [description, setDescription] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const { setBuildSteps } = useEditorStore()
+  const { setBuildSteps, executeSteps } = useEditorStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,24 +22,29 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
 
     setIsLoading(true)
     
-    const res = await axiosInstance.post("/api/template", {
+    try {
+      const res = await axiosInstance.post("/api/template", {
         prompt: description
-    })
+      })
 
-    const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0])
+      const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0]).map((x: BuildStep) => ({
+        ...x,
+        status: statusType.InProgress
+      }))
 
-    setBuildSteps(parsedSteps.map((x: BuildStep )=> ({
-      ...x,
-      status: statusType.Completed
-    })))
-
-    onSubmit(description.trim())
-    setIsLoading(false)
+      setBuildSteps(parsedSteps)
+      await executeSteps(parsedSteps)
+      onSubmit(description.trim())
+    } catch (error) {
+      console.error("Error generating steps:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
-
         {/* Main Form */}
         <div className="bg-gray-800/80 backdrop-blur-sm border border-gray-700 rounded-xl p-6 mb-6">
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -81,8 +86,6 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
             </button>
           </form>
         </div>
-
-       
       </div>
     </div>
   )

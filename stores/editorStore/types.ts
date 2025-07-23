@@ -1,5 +1,5 @@
 export interface BuildStep {
-    id: number
+    id: string
     title: string
     description: string
     type: BuildStepType
@@ -24,12 +24,12 @@ export enum BuildStepType {
     RunScript
 }
 
-interface FileItem {
-    name: string
-    path: string
-    type: "file" | "folder"
-    content?: string
-    children?: FileItem[]
+
+export type FileItemFlat = {
+  name: string
+  path: string
+  type: "file" | "folder"
+  content?: string
 }
 
 interface FileContent {
@@ -44,18 +44,21 @@ export interface StoreState {
     isBuilding: boolean
 
     // File system
-    fileTree: FileItem[]
+    fileItems: FileItemFlat[]
     files: Record<string, FileContent>
     selectedFile: string | null
 
     // Actions
-    setBuildSteps: (steps: BuildStep[]) => void
+     setBuildSteps: (steps: BuildStep[]) => void
     clearBuildSteps: () => void
     startBuild: () => void
     stopBuild: () => void
-
+    setStepStatus: (id: string, status: statusType) => void
     setSelectedFile: (path: string | null) => void
     updateFileContent: (path: string, content: string) => void
-    addFile: (name: string, content: string) => void
-    addFolder: (name: string) => void
+    setFileItems: (items: FileItemFlat[]) => void
+    setFiles: (files: Record<string, FileContent>) => void
+    addFile: (path: string, content: string) => void
+    addFileItem: (item: FileItemFlat) => void
+    executeSteps: (steps: BuildStep[]) => Promise<void>
 }

@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
 import { FileIcon, Folder, X } from "lucide-react"
@@ -15,7 +14,7 @@ export function CreateFileModal({ isOpen, onClose }: CreateFileModalProps) {
   const [name, setName] = useState("")
   const [type, setType] = useState<"file" | "folder">("file")
   const [template, setTemplate] = useState("react-component")
-  const { addFile, addFolder } = useStore()
+  const { fileItems, setFileItems, files, setFiles } = useStore()
 
   const templates = {
     "react-component": {
@@ -95,15 +94,41 @@ export async function POST(request: NextRequest) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    const trimmedName = name.trim()
+    if (!trimmedName) return
 
-    if (!name.trim()) return
+    const basePath = "src" // Or allow the user to pick a folder
+    const fullPath = `${basePath}/${trimmedName}`
 
     if (type === "folder") {
-      addFolder(name.trim())
+      const newFolder = {
+        name: trimmedName,
+        path: fullPath,
+        type: "folder" as const,
+      }
+      setFileItems([...fileItems, newFolder])
     } else {
       const selectedTemplate = templates[template as keyof typeof templates]
-      const fileName = name.includes(".") ? name : name + selectedTemplate.extension
-      addFile(fileName, selectedTemplate.content)
+      const fileName = trimmedName.includes(".")
+        ? trimmedName
+        : trimmedName + selectedTemplate.extension
+
+      const fullFilePath = `${basePath}/${fileName}`
+      const newFile = {
+        name: fileName,
+        path: fullFilePath,
+        type: "file" as const,
+      }
+
+      setFileItems([...fileItems, newFile])
+      setFiles({
+        ...files,
+        [fullFilePath]: {
+          name: fileName,
+          content: selectedTemplate.content,
+          path: fullFilePath,
+        },
+      })
     }
 
     setName("")

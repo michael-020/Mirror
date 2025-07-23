@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
 import { ChevronRight, ChevronDown, FileIcon, Folder, FolderOpen, Search } from "lucide-react"
+import type { FileItemFlat } from "@/stores/editorStore/types"
 
 interface FileTreeItemProps {
   item: any
@@ -77,13 +78,95 @@ function FileTreeItem({ item, level, onFileSelect, selectedFile }: FileTreeItemP
   )
 }
 
+function buildNestedTree(items: FileItemFlat[]): any[] {
+  const root: Record<string, any> = {}
+
+  for (const item of items) {
+    const parts = item.path.split("/")
+    let current = root
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i]
+      const currentPath = parts.slice(0, i + 1).join("/")
+      const isFile = i === parts.length - 1 && item.type === "file"
+
+      if (!current[part]) {
+        current[part] = {
+          name: part,
+          path: currentPath,
+          type: isFile ? "file" : "folder",
+          children: isFile ? undefined : {},
+        }
+      }
+
+      if (!isFile) {
+        current = current[part].children
+      }
+    }
+  }
+
+  const convert = (node: any): any => {
+    return Object.values(node)
+      .map((item: any) => ({
+        ...item,
+        children: item.children ? convert(item.children) : undefined,
+      }))
+      .sort((a: any, b: any) => {
+        // Sort folders first, then files
+        if (a.type === "folder" && b.type === "file") return -1
+        if (a.type === "file" && b.type === "folder") return 1
+        
+        // Within same type, sort alphabetically
+        return a.name.localeCompare(b.name)
+      })
+  }
+
+  return convert(root)
+}
+
+function sortFileItems(items: FileItemFlat[]): FileItemFlat[] {
+  return items.slice().sort((a, b) => {
+    
+    // Prioritize by specific folder names (src first)
+    const aSrc = a.path.startsWith("src/") || a.path === "src"
+    const bSrc = b.path.startsWith("src/") || b.path === "src"
+    
+    if (aSrc && !bSrc) return -1
+    if (!aSrc && bSrc) return 1
+    
+    // Then sort by type (folders first)
+    if (a.type === "folder" && b.type === "file") return -1
+    if (a.type === "file" && b.type === "folder") return 1
+    
+    // Finally sort alphabetically
+    return a.name.localeCompare(b.name)
+  })
+}
+
 export function FileExplorer() {
-  const { fileTree, selectedFile, setSelectedFile } = useStore()
+  const { fileItems, selectedFile, setSelectedFile } = useStore()
   const [searchTerm, setSearchTerm] = useState("")
 
   const handleFileSelect = (file: any) => {
     setSelectedFile(file.path)
   }
+
+  const filteredAndSortedItems = useMemo(() => {
+    let filtered = fileItems
+    
+    if (searchTerm) {
+      filtered = fileItems.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.path.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+    
+    return sortFileItems(filtered)
+  }, [fileItems, searchTerm])
+
+  const filteredTree = useMemo(() => {
+    return buildNestedTree(filteredAndSortedItems)
+  }, [filteredAndSortedItems])
 
   return (
     <div className="h-full flex flex-col">
@@ -104,7 +187,7 @@ export function FileExplorer() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {fileTree.map((item) => (
+        {filteredTree.map((item) => (
           <FileTreeItem
             key={item.path}
             item={item}
@@ -113,10 +196,23 @@ export function FileExplorer() {
             selectedFile={selectedFile}
           />
         ))}
+        
+        {filteredTree.length === 0 && fileItems.length > 0 && (
+          <div className="p-4 text-center text-gray-500 text-sm">
+            No files match your search
+          </div>
+        )}
+        
+        {fileItems.length === 0 && (
+          <div className="p-4 text-center text-gray-500 text-sm">
+            No files yet. Start building to see your project structure.
+          </div>
+        )}
       </div>
 
-      {/* File Count */}
-      <div className="p-3 border-t border-gray-700 text-xs text-gray-500">{fileTree.length} items</div>
+      <div className="p-3 border-t border-gray-700 text-xs text-gray-500">
+        {fileItems.length} items
+      </div>
     </div>
   )
 }

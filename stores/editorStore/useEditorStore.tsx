@@ -1,13 +1,13 @@
 "use client"
 
 import { create } from "zustand"
-import { BuildStep, StoreState } from "./types"
+import { BuildStep, BuildStepType, FileItemFlat, statusType, StoreState } from "./types"
 
 export const useEditorStore = create<StoreState>((set, get) => ({
   // Initial state
   buildSteps: [],
   isBuilding: false,
-  fileTree: [],
+  fileItems: [],
   files: {},
   selectedFile: null,
 
@@ -26,6 +26,13 @@ export const useEditorStore = create<StoreState>((set, get) => ({
 
   stopBuild: () => set({ isBuilding: false }),
 
+  setStepStatus: (id: string, status: statusType) =>
+    set((state) => ({
+      buildSteps: state.buildSteps.map((step) =>
+        step.id === id ? { ...step, status } : step
+      ),
+    })),
+
   // File actions
   setSelectedFile: (path) => set({ selectedFile: path }),
 
@@ -40,21 +47,87 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       },
     })),
 
-  addFile: (name, content) => {
-    const path = `src/${name}`
-    set((state) => ({
-      files: {
-        ...state.files,
-        [path]: { name, content, path },
-      },
-      fileTree: [...state.fileTree, { name, path, type: "file" }],
-    }))
-  },
+    setFileItems: (items: FileItemFlat[]) => set({ fileItems: items }),
+    
+    setFiles: (files) => set({ files }),
 
-  addFolder: (name) => {
-    const path = `src/${name}`
-    set((state) => ({
-      fileTree: [...state.fileTree, { name, path, type: "folder", children: [] }],
-    }))
-  },
+    // Add file to existing files (accumulative)
+    addFile: (path: string, content: string) =>
+      set((state) => ({
+        files: {
+          ...state.files,
+          [path]: {
+            name: path.split("/").pop() || path,
+            content,
+            path,
+          },
+        },
+    })),
+
+    addFileItem: (item: FileItemFlat) =>
+      set((state) => {
+        const exists = state.fileItems.some(existing => existing.path === item.path)
+        if (exists) return state
+        
+        return {
+          fileItems: [...state.fileItems, item],
+        }
+      }),
+
+    executeSteps: async (steps: BuildStep[]) => {
+      const { setStepStatus, addFile, addFileItem } = get()
+      
+      for (const step of steps) {
+        try {
+          if (step.title === "Project Files") {
+            console.log("Skipping Project Files step:", step)
+            continue
+          }
+
+          setStepStatus(step.id, statusType.InProgress)
+          
+          switch (step.type) {
+            case BuildStepType.CreateFile: {
+              if (!step.path || !step.code) {
+                console.error("CreateFile step missing path or code:", step)
+                throw new Error("Missing path or code")
+              }
+
+              addFile(step.path, step.code)
+
+              addFileItem({
+                name: step.path.split("/").pop() || step.path,
+                path: step.path,
+                type: "file"
+              })
+              break
+            }
+
+            case BuildStepType.CreateFolder: {
+              if (!step.path) {
+                console.error("CreateFolder step missing path:", step)
+                throw new Error(`Missing path for folder creation. Step: ${JSON.stringify(step)}`)
+              }
+
+              addFileItem({
+                name: step.path.split("/").pop() || step.path,
+                path: step.path,
+                type: "folder"
+              })
+              break
+            }
+
+            default:
+              console.warn("Unhandled step type:", step.type, step)
+          }
+
+          setStepStatus(step.id, statusType.Completed)
+
+          await new Promise((res) => setTimeout(res, 200))
+        } catch (err) {
+          console.error("Error executing step:", err)
+          setStepStatus(step.id, statusType.Error)
+        }
+      }
+    },
 }))
