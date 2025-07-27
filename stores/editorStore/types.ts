@@ -7,6 +7,7 @@ export interface BuildStep {
     timestamp?: Date
     code?: string;
     path?: string;
+    shouldExecute?: boolean; 
 }
 
 export enum statusType {
@@ -21,7 +22,8 @@ export enum BuildStepType {
     CreateFolder,
     EditFile,
     DeleteFile,
-    RunScript
+    RunScript,
+    NonExecutuable
 }
 
 
@@ -61,4 +63,5 @@ export interface StoreState {
     addFile: (path: string, content: string) => void
     addFileItem: (item: FileItemFlat) => void
     executeSteps: (steps: BuildStep[]) => Promise<void>
+    processPrompt: (prompt: string) => void;
 }

@@ -2,10 +2,7 @@
 
 import { useState } from "react"
 import { ArrowRight, Sparkles } from 'lucide-react'
-import { axiosInstance } from "@/lib/axios"
 import { useEditorStore } from "@/stores/editorStore/useEditorStore"
-import { parseXml } from "@/lib/steps"
-import { BuildStep, statusType } from "@/stores/editorStore/types"
 
 interface ProjectInitializerProps {
   onSubmit: (description: string) => void
@@ -14,7 +11,7 @@ interface ProjectInitializerProps {
 export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
   const [description, setDescription] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const { setBuildSteps, executeSteps } = useEditorStore()
+  const { processPrompt } = useEditorStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,30 +20,10 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
     setIsLoading(true)
     
     try {
-      const res = await axiosInstance.post("/api/template", {
-        prompt: description
-      })
-
-      const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0]).map((x: BuildStep) => ({
-        ...x,
-        status: statusType.InProgress
-      }))
-
-      setBuildSteps(parsedSteps)
-      await executeSteps(parsedSteps)
+      processPrompt(description)
+      
       onSubmit(description.trim())
 
-      const response = await axiosInstance.post("/api/chat", {
-        prompt: description,
-        messages: res.data.prompts
-      })
-      console.log("nest steps: ", response.data.response)
-      const parsedResponse: BuildStep[] = parseXml(response.data.response.join('')).map((x: BuildStep) => ({
-        ...x,
-        status: statusType.InProgress
-      }))
-      setBuildSteps(parsedResponse)
-      await executeSteps(parsedResponse)
     } catch (error) {
       console.error("Error generating steps:", error)
     } finally {

@@ -1,15 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { useState } from "react"
-import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
+import { useEditorStore } from "@/stores/editorStore/useEditorStore"
 import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucide-react'
-import { axiosInstance } from "@/lib/axios"
-import { parseXml } from "@/lib/steps"
-import { BuildStep, statusType } from "@/stores/editorStore/types"
+import { statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
-  const { buildSteps, isBuilding, setBuildSteps, executeSteps } = useStore()
+  const { buildSteps, isBuilding, processPrompt } = useEditorStore()
   const [prompt, setPrompt] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
@@ -20,17 +17,7 @@ export function StatusPanel() {
     setIsLoading(true)
     
     try {
-      const res = await axiosInstance.post("/api/template", {
-        prompt: prompt
-      })
-
-      const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0]).map((x: BuildStep) => ({
-        ...x,
-        status: statusType.InProgress
-      }))
-      
-      setBuildSteps(parsedSteps)
-      await executeSteps(parsedSteps)
+      processPrompt(prompt)
       setPrompt("") 
     } catch (error) {
       console.error("Error generating steps:", error)
@@ -89,7 +76,7 @@ export function StatusPanel() {
         )}
 
         {buildSteps
-          .filter(step => step.title !== "Project Files")
+          .filter(step => step.shouldExecute !== false)
           .map((step) => (
             <div key={step.id} className="flex items-start gap-3 py-0.5 group">
               {getStatusIcon(step.status)}

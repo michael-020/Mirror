@@ -2,6 +2,8 @@
 
 import { create } from "zustand"
 import { BuildStep, BuildStepType, FileItemFlat, statusType, StoreState } from "./types"
+import { axiosInstance } from "@/lib/axios"
+import { parseXml } from "@/lib/steps"
 
 export const useEditorStore = create<StoreState>((set, get) => ({
   // Initial state
@@ -115,6 +117,10 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                 type: "folder"
               })
               break
+
+            }
+            case BuildStepType.NonExecutuable: {
+              break;
             }
 
             default:
@@ -130,4 +136,34 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         }
       }
     },
+
+    processPrompt: async (prompt) => {
+      try {
+        const res = await axiosInstance.post("/api/template", {
+          prompt
+        })
+        
+        const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0]).map((x: BuildStep) => ({
+          ...x,
+          status: statusType.InProgress
+        }))
+  
+        get().setBuildSteps(parsedSteps)
+        await get().executeSteps(parsedSteps.filter(step => step.shouldExecute !== false))
+  
+        const response = await axiosInstance.post("/api/chat", {
+          prompt,
+          messages: res.data.prompts
+        })
+        console.log("nest steps: ", response.data.response)
+        const parsedResponse: BuildStep[] = parseXml(response.data.response.join('')).map((x: BuildStep) => ({
+          ...x,
+          status: statusType.InProgress
+        }))
+        get().setBuildSteps(parsedResponse)
+        await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false))
+      } catch (error) {
+        console.error("Error while creating a project", error)
+      }
+    }
 }))

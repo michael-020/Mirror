@@ -67,8 +67,9 @@ export function parseXml(response: string): BuildStep[] {
     id: uuidv4(),
     title: artifactTitle,
     description: 'Initialize project folder structure and setup files',
-    type: BuildStepType.CreateFolder,
+    type: BuildStepType.NonExecutuable,
     status: statusType.Pending,
+    shouldExecute: false
   });
 
   const actionRegex = /<boltAction\s+type="([^"]*)"(?:\s+filePath="([^"]*)")?>([\s\S]*?)<\/boltAction>/g;
