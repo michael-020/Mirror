@@ -20,6 +20,7 @@ export async function POST(req: NextRequest){
             role: "system",
             content: getSystemPrompt(),
         });
+        
         const completion = await openai.chat.completions.create({
             model: "gemini-2.5-flash",
             messages: formattedMessages,

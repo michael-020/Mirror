@@ -35,6 +35,18 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
       setBuildSteps(parsedSteps)
       await executeSteps(parsedSteps)
       onSubmit(description.trim())
+
+      const response = await axiosInstance.post("/api/chat", {
+        prompt: description,
+        messages: res.data.prompts
+      })
+      console.log("nest steps: ", response.data.response)
+      const parsedResponse: BuildStep[] = parseXml(response.data.response.join('')).map((x: BuildStep) => ({
+        ...x,
+        status: statusType.InProgress
+      }))
+      setBuildSteps(parsedResponse)
+      await executeSteps(parsedResponse)
     } catch (error) {
       console.error("Error generating steps:", error)
     } finally {
@@ -43,7 +55,7 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
         {/* Main Form */}
         <div className="bg-gray-800/80 backdrop-blur-sm border border-gray-700 rounded-xl p-6 mb-6">
