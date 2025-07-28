@@ -3,13 +3,14 @@
 import { useState } from "react"
 import { useEditorStore } from "@/stores/editorStore/useEditorStore"
 import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucide-react'
-import { statusType } from "@/stores/editorStore/types"
+import { BuildStepType, statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
   const { buildSteps, isBuilding, processPrompt } = useEditorStore()
   const [prompt, setPrompt] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-
+  
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!prompt.trim()) return
@@ -42,6 +43,10 @@ export function StatusPanel() {
   const completedSteps = buildSteps.filter(step => step.status === statusType.Completed).length
   const totalSteps = buildSteps.length
   const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
+
+  // useEffect(() => {
+  //   useMountFilesToWebContainer()
+  // }, [files])
 
   return (
     <div className="h-[94vh] flex flex-col">
@@ -80,9 +85,9 @@ export function StatusPanel() {
           .map((step) => (
             <div key={step.id} className="flex items-start gap-3 py-0.5 group">
               {getStatusIcon(step.status)}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 flex flex-col">
                 <p className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                  {step.title}
+                  {step.type === BuildStepType.RunScript ? step.description :  step.title}
                 </p>
               </div>
             </div>

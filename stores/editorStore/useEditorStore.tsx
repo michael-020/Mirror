@@ -12,6 +12,7 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   fileItems: [],
   files: {},
   selectedFile: null,
+  shellCommands: [],
 
   // Build actions
   setBuildSteps: (steps: BuildStep[]) =>
@@ -76,6 +77,11 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         }
       }),
 
+    setShellCommand: (command: string) =>
+      set((state) => ({
+        shellCommands: [...state.shellCommands, command],
+      })),
+    
     executeSteps: async (steps: BuildStep[]) => {
       const { setStepStatus, addFile, addFileItem } = get()
       
@@ -119,6 +125,15 @@ export const useEditorStore = create<StoreState>((set, get) => ({
               break
 
             }
+
+            case BuildStepType.RunScript: {
+              if (step.description) {
+                console.log("Shell command to execute:", step.description)
+                get().setShellCommand(step.description)
+              }
+              break
+            }
+
             case BuildStepType.NonExecutuable: {
               break;
             }
@@ -155,7 +170,7 @@ export const useEditorStore = create<StoreState>((set, get) => ({
           prompt,
           messages: res.data.prompts
         })
-        console.log("nest steps: ", response.data.response)
+
         const parsedResponse: BuildStep[] = parseXml(response.data.response.join('')).map((x: BuildStep) => ({
           ...x,
           status: statusType.InProgress

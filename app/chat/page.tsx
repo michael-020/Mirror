@@ -3,18 +3,17 @@
 import { useEffect, useRef, useState } from "react"
 import { StatusPanel } from "@/components/status-panel"
 import { FileExplorer } from "@/components/file-explorer"
-import { CodeEditor } from "@/components/code-editor"
 import { CreateFileModal } from "@/components/create-file-modal"
 import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
 import { Plus, Play, Square, ArrowLeft } from "lucide-react"
 import { ProjectInitializer } from "@/components/project-initializer"
+import { EditorWorkspace } from "@/components/editor-workspace"
 
 export default function ChatPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showMainInterface, setShowMainInterface] = useState(false)
   const [projectDescription, setProjectDescription] = useState("")
   const { isBuilding, startBuild, stopBuild, setSelectedFile, fileItems, clearBuildSteps, setFileItems, setFiles } = useStore()
-
   const hasSelectedInitialFile = useRef(false)
 
   // Auto-select first file when files are created
@@ -117,7 +116,7 @@ export default function ChatPage() {
 
         {/* Right Column - Code Editor & Preview */}
         <div className="col-span-6 bg-gray-900">
-          <CodeEditor />
+          <EditorWorkspace/>
         </div>
       </div>
 

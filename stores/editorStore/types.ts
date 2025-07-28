@@ -34,7 +34,7 @@ export type FileItemFlat = {
   content?: string
 }
 
-interface FileContent {
+export interface FileContent {
     name: string
     content: string
     path: string
@@ -50,8 +50,10 @@ export interface StoreState {
     files: Record<string, FileContent>
     selectedFile: string | null
 
+    shellCommands: string[]
+
     // Actions
-     setBuildSteps: (steps: BuildStep[]) => void
+    setBuildSteps: (steps: BuildStep[]) => void
     clearBuildSteps: () => void
     startBuild: () => void
     stopBuild: () => void
@@ -64,4 +66,5 @@ export interface StoreState {
     addFileItem: (item: FileItemFlat) => void
     executeSteps: (steps: BuildStep[]) => Promise<void>
     processPrompt: (prompt: string) => void;
+    setShellCommand: (command: string) => void;
 }
