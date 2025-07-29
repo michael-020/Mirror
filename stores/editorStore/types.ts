@@ -1,3 +1,5 @@
+import { WebContainer } from "@webcontainer/api"
+
 export interface BuildStep {
     id: string
     title: string
@@ -31,7 +33,7 @@ export type FileItemFlat = {
   name: string
   path: string
   type: "file" | "folder"
-  content?: string
+  content: string
 }
 
 export interface FileContent {
@@ -51,8 +53,10 @@ export interface StoreState {
     selectedFile: string | null
 
     shellCommands: string[]
+    webcontainer: WebContainer | null;
 
     // Actions
+    setWebcontainer: (instance: WebContainer) => void;
     setBuildSteps: (steps: BuildStep[]) => void
     clearBuildSteps: () => void
     startBuild: () => void

@@ -1,15 +1,14 @@
-import type React from "react"
-import type { Metadata } from "next"
+"use client"
 
-export const metadata: Metadata = {
-  title: "Website Builder - Chat",
-  description: "Build websites with AI assistance",
-}
+import type React from "react"
+import { useWebContainer } from "@/hooks/useWebContainer"
 
 export default function ChatLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  useWebContainer()
+
   return children
 }

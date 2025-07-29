@@ -4,6 +4,7 @@ import { create } from "zustand"
 import { BuildStep, BuildStepType, FileItemFlat, statusType, StoreState } from "./types"
 import { axiosInstance } from "@/lib/axios"
 import { parseXml } from "@/lib/steps"
+import { WebContainer } from "@webcontainer/api"
 
 export const useEditorStore = create<StoreState>((set, get) => ({
   // Initial state
@@ -13,7 +14,12 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   files: {},
   selectedFile: null,
   shellCommands: [],
+  webcontainer: null,
 
+  setWebcontainer: async (instance: WebContainer) => {
+    set({ webcontainer: instance })
+    console.log("webcontainer setup")
+  },
   // Build actions
   setBuildSteps: (steps: BuildStep[]) =>
     set((state) => ({
@@ -106,7 +112,8 @@ export const useEditorStore = create<StoreState>((set, get) => ({
               addFileItem({
                 name: step.path.split("/").pop() || step.path,
                 path: step.path,
-                type: "file"
+                type: "file",
+                content: ""
               })
               break
             }
@@ -120,7 +127,8 @@ export const useEditorStore = create<StoreState>((set, get) => ({
               addFileItem({
                 name: step.path.split("/").pop() || step.path,
                 path: step.path,
-                type: "folder"
+                type: "folder",
+                content: ""
               })
               break
 
