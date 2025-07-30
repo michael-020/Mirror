@@ -25,7 +25,7 @@ export async function POST(req: NextRequest){
             model: "gemini-2.5-flash",
             messages: formattedMessages,
             stream: true,
-            max_completion_tokens: 8000
+            max_completion_tokens: 100000
         });
         const res = []
         for await (const chunk of completion) {

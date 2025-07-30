@@ -6,10 +6,9 @@ import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucid
 import { BuildStepType, statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
-  const { buildSteps, isBuilding, processPrompt } = useEditorStore()
+  const { buildSteps, isBuilding, processFollowupPrompts, messages } = useEditorStore()
   const [prompt, setPrompt] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,7 +17,13 @@ export function StatusPanel() {
     setIsLoading(true)
     
     try {
-      processPrompt(prompt)
+      const messageHistory = messages.filter(msg => msg !== null);
+      
+      processFollowupPrompts(
+        prompt, 
+        messageHistory
+      );
+      
       setPrompt("") 
     } catch (error) {
       console.error("Error generating steps:", error)

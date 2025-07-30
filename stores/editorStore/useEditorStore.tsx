@@ -15,16 +15,25 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   selectedFile: null,
   shellCommands: [],
   webcontainer: null,
+  messages: [],
 
   setWebcontainer: async (instance: WebContainer) => {
     set({ webcontainer: instance })
     console.log("webcontainer setup")
   },
+
+  setMessages: (messages: string | string[]) => {
+    set((state) => ({
+      messages: [...state.messages, ...(Array.isArray(messages) ? messages : [messages])]
+    }))
+  },
   // Build actions
-  setBuildSteps: (steps: BuildStep[]) =>
+  setBuildSteps: (steps: BuildStep[]) =>{
+    console.log("setting up build steps")
     set((state) => ({
       buildSteps: [...state.buildSteps, ...steps],
-    })),
+    }))
+  },
 
   clearBuildSteps: () => set({ buildSteps: [] }),
 
@@ -90,7 +99,7 @@ export const useEditorStore = create<StoreState>((set, get) => ({
     
     executeSteps: async (steps: BuildStep[]) => {
       const { setStepStatus, addFile, addFileItem } = get()
-      
+      console.log("executing steps")
       for (const step of steps) {
         try {
           if (step.title === "Project Files") {
@@ -185,8 +194,39 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         }))
         get().setBuildSteps(parsedResponse)
         await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false))
+
+        get().setMessages(res.data.prompts)
+        // console.log("first: ", get().messages)
+
+        get().setMessages(response.data.response)
+        // console.log("second: ", get().messages)
       } catch (error) {
         console.error("Error while creating a project", error)
+      }
+    },
+
+    processFollowupPrompts: async (prompt, messages) => {
+      try {
+        // Ensure messages array is clean
+        const cleanMessages = messages.filter(Boolean);
+        
+        const response = await axiosInstance.post("/api/chat", {
+          prompt,
+          messages: cleanMessages
+        });
+
+        const parsedResponse: BuildStep[] = parseXml(response.data.response.join('')).map((x: BuildStep) => ({
+          ...x,
+          status: statusType.InProgress
+        }));
+
+        get().setBuildSteps(parsedResponse);
+        await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false));
+        
+        // Update messages with clean array
+        get().setMessages(cleanMessages);
+      } catch (error) {
+        console.error("Error processing followup prompt:", error);
       }
     }
 }))

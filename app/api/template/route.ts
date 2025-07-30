@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(
             { msg: "Model response did not match expected output. Expected 'node' or 'react', but got something else." },
-            { status: 200 }
+            { status: 400 }
         )
 
     } catch (error) {

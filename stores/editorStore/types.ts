@@ -54,6 +54,7 @@ export interface StoreState {
 
     shellCommands: string[]
     webcontainer: WebContainer | null;
+    messages: string[]
 
     // Actions
     setWebcontainer: (instance: WebContainer) => void;
@@ -71,4 +72,6 @@ export interface StoreState {
     executeSteps: (steps: BuildStep[]) => Promise<void>
     processPrompt: (prompt: string) => void;
     setShellCommand: (command: string) => void;
+    setMessages: (messages: string | string[]) => void;
+    processFollowupPrompts: (prompt: string, messages: string[]) => void;
 }

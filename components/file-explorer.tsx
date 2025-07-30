@@ -214,7 +214,7 @@ export function FileExplorer() {
       }
     })
 
-    console.log('Mount structure:', mountStructure)
+    // console.log('Mount structure:', mountStructure)
     webcontainer?.mount(mountStructure)
   }, [fileItems, files, webcontainer]) 
   return (
