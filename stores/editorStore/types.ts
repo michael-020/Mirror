@@ -46,6 +46,9 @@ export interface StoreState {
     // Build status
     buildSteps: BuildStep[]
     isBuilding: boolean
+    isInitialising: boolean,
+    isProcessing: boolean,
+    isProcessingFollowups: boolean,
 
     // File system
     fileItems: FileItemFlat[]
@@ -55,6 +58,7 @@ export interface StoreState {
     shellCommands: string[]
     webcontainer: WebContainer | null;
     messages: string[]
+
 
     // Actions
     setWebcontainer: (instance: WebContainer) => void;

@@ -23,7 +23,7 @@ export function EditorWorkspace() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-[calc(100vh-3rem)]">
       <CodeEditorTabs activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="flex-1 overflow-hidden">
         {activeTab === "code" ? (

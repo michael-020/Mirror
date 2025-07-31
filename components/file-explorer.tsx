@@ -218,7 +218,7 @@ export function FileExplorer() {
     webcontainer?.mount(mountStructure)
   }, [fileItems, files, webcontainer]) 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-[calc(100vh-4rem)] flex flex-col custom-scrollbar">
       <div className="p-4 border-b border-gray-700 space-y-3">
         <h2 className="text-sm font-semibold text-gray-300">Explorer</h2>
 
@@ -259,9 +259,7 @@ export function FileExplorer() {
         )}
       </div>
 
-      <div className="p-3 border-t border-gray-700 text-xs text-gray-500">
-        {fileItems.length} items
-      </div>
+      
     </div>
   )
 }

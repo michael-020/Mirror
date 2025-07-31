@@ -16,6 +16,9 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   shellCommands: [],
   webcontainer: null,
   messages: [],
+  isInitialising: false,
+  isProcessing: false,
+  isProcessingFollowups: false,
 
   setWebcontainer: async (instance: WebContainer) => {
     set({ webcontainer: instance })
@@ -170,44 +173,49 @@ export const useEditorStore = create<StoreState>((set, get) => ({
     },
 
     processPrompt: async (prompt) => {
+      set({ isProcessing: true, isInitialising: true })
+
       try {
-        const res = await axiosInstance.post("/api/template", {
-          prompt
-        })
-        
-        const parsedSteps: BuildStep[] = parseXml(res.data.uiPrompts[0]).map((x: BuildStep) => ({
+        const res = await axiosInstance.post("/api/template", { prompt })
+
+        const parsedSteps = parseXml(res.data.uiPrompts[0]).map((x: BuildStep) => ({
           ...x,
           status: statusType.InProgress
         }))
-  
         get().setBuildSteps(parsedSteps)
         await get().executeSteps(parsedSteps.filter(step => step.shouldExecute !== false))
-  
+
+        get().setMessages(res.data.prompts)
+      } catch (err) {
+        console.error("Error during initialisation:", err)
+      } finally {
+        set({ isInitialising: false })
+      }
+
+      try {
         const response = await axiosInstance.post("/api/chat", {
           prompt,
-          messages: res.data.prompts
+          messages: get().messages
         })
 
-        const parsedResponse: BuildStep[] = parseXml(response.data.response.join('')).map((x: BuildStep) => ({
+        const parsedResponse = parseXml(response.data.response.join("")).map((x: BuildStep) => ({
           ...x,
           status: statusType.InProgress
         }))
         get().setBuildSteps(parsedResponse)
         await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false))
 
-        get().setMessages(res.data.prompts)
-        // console.log("first: ", get().messages)
-
         get().setMessages(response.data.response)
-        // console.log("second: ", get().messages)
-      } catch (error) {
-        console.error("Error while creating a project", error)
+      } catch (err) {
+        console.error("Error during build:", err)
+      } finally {
+        set({ isProcessing: false })
       }
     },
 
     processFollowupPrompts: async (prompt, messages) => {
+      set({isProcessingFollowups: true})
       try {
-        // Ensure messages array is clean
         const cleanMessages = messages.filter(Boolean);
         
         const response = await axiosInstance.post("/api/chat", {
@@ -223,10 +231,11 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         get().setBuildSteps(parsedResponse);
         await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false));
         
-        // Update messages with clean array
         get().setMessages(cleanMessages);
       } catch (error) {
         console.error("Error processing followup prompt:", error);
+      } finally {
+        set({isProcessingFollowups: false})
       }
     }
 }))

@@ -6,30 +6,21 @@ import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucid
 import { BuildStepType, statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
-  const { buildSteps, isBuilding, processFollowupPrompts, messages } = useEditorStore()
+  const { buildSteps, isBuilding, processFollowupPrompts, messages, isProcessing, isProcessingFollowups } = useEditorStore()
   const [prompt, setPrompt] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!prompt.trim()) return
-
-    setIsLoading(true)
     
-    try {
-      const messageHistory = messages.filter(msg => msg !== null);
-      
-      processFollowupPrompts(
-        prompt, 
-        messageHistory
-      );
-      
-      setPrompt("") 
-    } catch (error) {
-      console.error("Error generating steps:", error)
-    } finally {
-      setIsLoading(false)
-    }
+    const messageHistory = messages.filter(msg => msg !== null);
+    
+    processFollowupPrompts(
+      prompt, 
+      messageHistory
+    );
+    
+    setPrompt("") 
   }
 
   const getStatusIcon = (status: statusType) => {
@@ -77,17 +68,8 @@ export function StatusPanel() {
         )}
       </div>
 
-      <div className="flex-1 overflow-auto p-4 space-y-2">
-        {buildSteps.length === 0 && !isBuilding && (
-          <div className="text-center py-8">
-            <div className="text-gray-500 text-sm mb-2">Ready to build</div>
-            <div className="text-xs text-gray-600">Click &quot;Start Build&quot; to begin creating your website</div>
-          </div>
-        )}
-
-        {buildSteps
-          .filter(step => step.shouldExecute !== false)
-          .map((step) => (
+      <div className="flex-1 overflow-auto p-4 space-y-2 custom-scrollbar">
+        {buildSteps.filter(step => step.shouldExecute !== false).map((step) => (
             <div key={step.id} className="flex items-start gap-3 py-0.5 group">
               {getStatusIcon(step.status)}
               <div className="flex-1 min-w-0 flex flex-col">
@@ -98,10 +80,10 @@ export function StatusPanel() {
             </div>
         ))}
 
-        {isLoading && (
-          <div className="flex items-center gap-2 text-xs text-blue-400 mt-4 p-2 bg-blue-900/20 rounded-md">
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-            Processing your request...
+        {isProcessing && (
+          <div className="flex items-center gap-2 text-sm text-blue-400 mt-4 p-3 bg-blue-900/20 rounded-lg">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Processing changes...</span>
           </div>
         )}
       </div>
@@ -111,21 +93,22 @@ export function StatusPanel() {
           <input
             type="text"
             value={prompt}
+            readOnly={isProcessing || isProcessingFollowups}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Enter your next instruction..."
             className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
           <button
             type="submit"
-            disabled={!prompt.trim() || isLoading}
+            disabled={!prompt.trim() || isProcessingFollowups}
             className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
-              prompt.trim() && !isLoading
+              prompt.trim() && !isProcessing
                 ? "bg-blue-600 hover:bg-blue-700 text-white"
                 : "bg-gray-600 text-gray-400 cursor-not-allowed"
             }`}
           >
-            {isLoading ? (
-             <Loader2 className="animate-spin" />
+            {isProcessingFollowups ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <>
                 <span>Send</span>

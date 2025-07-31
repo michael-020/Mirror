@@ -21,3 +21,23 @@ body{
   --color-custom-wine-500: oklch(0.3858 0.0735 12.44);
   --color-custom-wine-600: oklch(0.3352 0.0627 11.98);
 }
+
+@layer utilities {
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-blue-600) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #364153;
+    border-radius: 20px;
+  }
+}

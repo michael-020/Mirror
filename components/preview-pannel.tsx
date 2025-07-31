@@ -15,13 +15,11 @@ export function PreviewPanel() {
             return
         }
 
-        console.log("hey there")
         const installProcess = await webcontainer.spawn('npm', ['install']);
         console.log("npm i done")
 
         installProcess.output.pipeTo(new WritableStream({
-            write(data) {
-            console.log("data: ", data);
+            write() {
             }
         }));
 
@@ -39,17 +37,16 @@ export function PreviewPanel() {
     }, [])
     
     return (
-        <div className="h-full">
+        <div className="h-[calc(100vh-4rem)] overflow-hidden"> 
             {!url ? 
-                <div className="flex gap-4"> 
-                    <div>Generative preview</div>
-                    <Loader2 className="animate-spin size-16" />
+                <div className="h-full w-full items-center justify-center flex flex-col gap-4"> 
+                    <Loader2 className="animate-spin size-10" />
+                    <div className="text-xl">Generating preview</div>
                 </div>
             : 
                 <iframe 
                     src={url}
-                    width="100%" 
-                    height="100%" 
+                    className="w-full h-full"
                     title="Preview"
                     sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"
                 />
