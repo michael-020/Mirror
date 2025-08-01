@@ -26,16 +26,27 @@ export async function POST(req: NextRequest){
             stream: true,
             max_completion_tokens: 100000
         });
-        const res = []
-        for await (const chunk of completion) {
-            console.log(chunk.choices[0].delta.content);
-            res.push(chunk.choices[0].delta.content)
-        }
+       
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+            async start(controller) {
+                for await (const chunk of completion) {
+                    console.log(chunk.choices[0].delta.content);
+                    const content = chunk.choices[0].delta.content;
+                        if (content) {
+                            controller.enqueue(encoder.encode(content));
+                        }
+                    }
+                    controller.close();
+            }
+        });
 
-        return NextResponse.json(
-            { response: res},
-            { status: 200}
-        )
+        return new Response(stream, {
+            headers: {
+                "Content-Type": "text/plain",
+                "Transfer-Encoding": "chunked"
+            }
+        });
     } catch (error) {
         console.error("Error while chatting: ", error)
         return NextResponse.json(

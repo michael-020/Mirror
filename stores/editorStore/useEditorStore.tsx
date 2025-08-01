@@ -202,25 +202,53 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       try {
         const formattedMessages = get().messages as ChatMessage[]
 
-        const response = await axiosInstance.post("/api/chat", {
-          prompt: {
-            role: "user",
-            content: prompt
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
           },
-          messages: formattedMessages.map(x => ({
-            role: "user",
-            content: x
-          }))
-        })
+          body: JSON.stringify({
+            prompt: {
+              role: "user",
+              content: prompt
+            },
+            messages: formattedMessages.map(x => ({
+              role: "user",
+              content: x
+            }))
+          })
+        });
 
-        const parsedResponse = parseXml(response.data.response.join("")).map((x: BuildStep) => ({
+        if (!response.ok || !response.body) {
+          throw new Error("Failed to stream chat response");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let done = false;
+        let streamedContent = "";
+
+        while (!done) {
+          const { value, done: readerDone } = await reader.read();
+          done = readerDone;
+          if (value) {
+            const chunk = decoder.decode(value);
+            streamedContent += chunk;
+          }
+        }
+
+        get().setMessages({
+          role: "assistant",
+          content: streamedContent
+        });
+
+        const parsedResponse = parseXml(streamedContent).map((x: BuildStep) => ({
           ...x,
           status: statusType.InProgress
-        }))
-        get().setBuildSteps(parsedResponse)
-        await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false))
+        }));
 
-        get().setMessages(response.data.response)
+        get().setBuildSteps(parsedResponse);
+        await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false));
       } catch (err) {
         console.error("Error during build:", err)
       } finally {
