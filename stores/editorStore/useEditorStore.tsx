@@ -1,7 +1,7 @@
 "use client"
 
 import { create } from "zustand"
-import { BuildStep, BuildStepType, FileItemFlat, statusType, StoreState } from "./types"
+import { BuildStep, BuildStepType, ChatMessage, FileItemFlat, statusType, StoreState } from "./types"
 import { axiosInstance } from "@/lib/axios"
 import { parseXml } from "@/lib/steps"
 import { WebContainer } from "@webcontainer/api"
@@ -25,14 +25,16 @@ export const useEditorStore = create<StoreState>((set, get) => ({
     console.log("webcontainer setup")
   },
 
-  setMessages: (messages: string | string[]) => {
+  setMessages: (messages: ChatMessage | ChatMessage[]) => {
     set((state) => ({
-      messages: [...state.messages, ...(Array.isArray(messages) ? messages : [messages])]
+      messages: [
+        ...state.messages, 
+        ...(Array.isArray(messages) ? messages : [messages])
+      ]
     }))
   },
-  // Build actions
+
   setBuildSteps: (steps: BuildStep[]) =>{
-    console.log("setting up build steps")
     set((state) => ({
       buildSteps: [...state.buildSteps, ...steps],
     }))
@@ -176,7 +178,12 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       set({ isProcessing: true, isInitialising: true })
 
       try {
-        const res = await axiosInstance.post("/api/template", { prompt })
+        const res = await axiosInstance.post("/api/template", { 
+          prompt: {
+            role: "user",
+            content: prompt
+          } 
+        })
 
         const parsedSteps = parseXml(res.data.uiPrompts[0]).map((x: BuildStep) => ({
           ...x,
@@ -193,9 +200,17 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       }
 
       try {
+        const formattedMessages = get().messages as ChatMessage[]
+
         const response = await axiosInstance.post("/api/chat", {
-          prompt,
-          messages: get().messages
+          prompt: {
+            role: "user",
+            content: prompt
+          },
+          messages: formattedMessages.map(x => ({
+            role: "user",
+            content: x
+          }))
         })
 
         const parsedResponse = parseXml(response.data.response.join("")).map((x: BuildStep) => ({
@@ -217,10 +232,16 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       set({isProcessingFollowups: true})
       try {
         const cleanMessages = messages.filter(Boolean);
-        
+      
         const response = await axiosInstance.post("/api/chat", {
-          prompt,
-          messages: cleanMessages
+          prompt: {
+            role: "user",
+            content: prompt
+          },
+          messages: cleanMessages.map(m => ({
+            role: "assistant",
+            content: m
+          }))
         });
 
         const parsedResponse: BuildStep[] = parseXml(response.data.response.join('')).map((x: BuildStep) => ({
@@ -231,7 +252,7 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         get().setBuildSteps(parsedResponse);
         await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false));
         
-        get().setMessages(cleanMessages);
+        get().setMessages(cleanMessages as unknown as ChatMessage);
       } catch (error) {
         console.error("Error processing followup prompt:", error);
       } finally {

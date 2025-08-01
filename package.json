@@ -13,6 +13,7 @@
     "@monaco-editor/react": "^4.7.0",
     "@prisma/client": "^6.9.0",
     "@webcontainer/api": "^1.6.1",
+    "ai": "^5.0.0-canary.24",
     "axios": "^1.9.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.526.0",

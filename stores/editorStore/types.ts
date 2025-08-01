@@ -42,6 +42,11 @@ export interface FileContent {
     path: string
 }
 
+export type ChatMessage = {
+  role: "user" | "assistant",
+  content: string
+}
+
 export interface StoreState {
     // Build status
     buildSteps: BuildStep[]
@@ -57,7 +62,7 @@ export interface StoreState {
 
     shellCommands: string[]
     webcontainer: WebContainer | null;
-    messages: string[]
+    messages: ChatMessage[]
 
 
     // Actions
@@ -76,6 +81,6 @@ export interface StoreState {
     executeSteps: (steps: BuildStep[]) => Promise<void>
     processPrompt: (prompt: string) => void;
     setShellCommand: (command: string) => void;
-    setMessages: (messages: string | string[]) => void;
+    setMessages: (messages: ChatMessage | ChatMessage[]) => void;
     processFollowupPrompts: (prompt: string, messages: string[]) => void;
 }

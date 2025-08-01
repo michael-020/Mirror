@@ -12,15 +12,12 @@ export async function POST(req: NextRequest) {
             model: "gemini-2.5-flash",
             messages: [
                 {
-                    role: "user",
-                    content: prompt,
-                },
-                {
                     role: "system",
                     content: "Return either node or react based on what do you think this project should be. Only return a single word either 'node' or 'react'. Do not return anything extra"
-                }
+                },
+                prompt
             ],
-            max_completion_tokens: 2000
+            max_completion_tokens: 2000,
         });
 
         const answer = response.choices[0].message.content;
