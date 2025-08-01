@@ -204,7 +204,7 @@ export function FileExplorer() {
         
         currentLevel[finalName] = {
           file: {
-            contents: fileContent
+            contents: fileContent!
           }
         }
       } else if (item.type === 'folder') {

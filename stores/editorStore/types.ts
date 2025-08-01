@@ -33,19 +33,15 @@ export type FileItemFlat = {
   name: string
   path: string
   type: "file" | "folder"
-  content: string
+  content?: string
 }
 
 export interface FileContent {
     name: string
-    content: string
+    content?: string
     path: string
 }
 
-export type ChatMessage = {
-  role: "user" | "assistant",
-  content: string
-}
 
 export interface StoreState {
     // Build status
@@ -62,8 +58,8 @@ export interface StoreState {
 
     shellCommands: string[]
     webcontainer: WebContainer | null;
-    messages: ChatMessage[]
-
+    messages: string[]
+    data: string
 
     // Actions
     setWebcontainer: (instance: WebContainer) => void;
@@ -78,9 +74,9 @@ export interface StoreState {
     setFiles: (files: Record<string, FileContent>) => void
     addFile: (path: string, content: string) => void
     addFileItem: (item: FileItemFlat) => void
-    executeSteps: (steps: BuildStep[]) => Promise<void>
+    executeSteps: (steps: BuildStep[]) => void
     processPrompt: (prompt: string) => void;
     setShellCommand: (command: string) => void;
-    setMessages: (messages: ChatMessage | ChatMessage[]) => void;
-    processFollowupPrompts: (prompt: string, messages: string[]) => void;
+    setMessages: (messages: string | string[]) => void;
+    processFollowupPrompts: (prompt: string) => void;
 }

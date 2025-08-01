@@ -31,7 +31,7 @@ const uuidv4 = () => crypto.randomUUID();
  * The input can have strings in the middle they need to be ignored
  */
 
-function getTitleFromFile(fileName: string): string {
+export function getTitleFromFile(fileName: string): string {
   if (fileName === 'eslint.config.js') return 'Setup ESLint config';
   if (fileName === 'tailwind.config.js') return 'Configure Tailwind CSS';
   if (fileName === 'vite.config.ts') return 'Setup Vite config';
@@ -42,7 +42,7 @@ function getTitleFromFile(fileName: string): string {
   return `Create ${fileName}`;
 }
 
-function getDescriptionFromFile(fileName: string): string {
+export function getDescriptionFromFile(fileName: string): string {
   if (fileName === 'eslint.config.js') return 'Defines ESLint rules and plugins for code quality.';
   if (fileName === 'tailwind.config.js') return 'Customizes Tailwind utility classes.';
   if (fileName === 'vite.config.ts') return 'Configuration file for Vite build tool.';

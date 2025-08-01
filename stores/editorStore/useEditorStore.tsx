@@ -1,10 +1,11 @@
 "use client"
 
 import { create } from "zustand"
-import { BuildStep, BuildStepType, ChatMessage, FileItemFlat, statusType, StoreState } from "./types"
+import { BuildStep, BuildStepType, FileItemFlat, statusType, StoreState } from "./types"
 import { axiosInstance } from "@/lib/axios"
-import { parseXml } from "@/lib/steps"
+import { getDescriptionFromFile, getTitleFromFile, parseXml } from "@/lib/steps"
 import { WebContainer } from "@webcontainer/api"
+import toast from "react-hot-toast"
 
 export const useEditorStore = create<StoreState>((set, get) => ({
   // Initial state
@@ -19,13 +20,14 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   isInitialising: false,
   isProcessing: false,
   isProcessingFollowups: false,
+  data: "",
 
   setWebcontainer: async (instance: WebContainer) => {
     set({ webcontainer: instance })
     console.log("webcontainer setup")
   },
 
-  setMessages: (messages: ChatMessage | ChatMessage[]) => {
+  setMessages: (messages) => {
     set((state) => ({
       messages: [
         ...state.messages, 
@@ -74,18 +76,28 @@ export const useEditorStore = create<StoreState>((set, get) => ({
     
     setFiles: (files) => set({ files }),
 
-    // Add file to existing files (accumulative)
-    addFile: (path: string, content: string) =>
+    addFile: (path: string, content: string) =>{
       set((state) => ({
         files: {
           ...state.files,
           [path]: {
             name: path.split("/").pop() || path,
-            content,
             path,
           },
         },
-    })),
+      }))
+      set({selectedFile: path})
+      set((state) => ({
+          files: {
+            ...state.files,
+            [path]: {
+              name: path.split("/").pop() || path,
+              content,
+              path,
+            },
+          },
+      }))
+    },
 
     addFileItem: (item: FileItemFlat) =>
       set((state) => {
@@ -102,7 +114,7 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         shellCommands: [...state.shellCommands, command],
       })),
     
-    executeSteps: async (steps: BuildStep[]) => {
+    executeSteps: (steps: BuildStep[]) => {
       const { setStepStatus, addFile, addFileItem } = get()
       console.log("executing steps")
       for (const step of steps) {
@@ -165,8 +177,6 @@ export const useEditorStore = create<StoreState>((set, get) => ({
           }
 
           setStepStatus(step.id, statusType.Completed)
-
-          await new Promise((res) => setTimeout(res, 200))
         } catch (err) {
           console.error("Error executing step:", err)
           setStepStatus(step.id, statusType.Error)
@@ -190,7 +200,7 @@ export const useEditorStore = create<StoreState>((set, get) => ({
           status: statusType.InProgress
         }))
         get().setBuildSteps(parsedSteps)
-        await get().executeSteps(parsedSteps.filter(step => step.shouldExecute !== false))
+        get().executeSteps(parsedSteps.filter(step => step.shouldExecute !== false))
 
         get().setMessages(res.data.prompts)
       } catch (err) {
@@ -200,7 +210,10 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       }
 
       try {
-        const formattedMessages = get().messages as ChatMessage[]
+        const formattedMessages = get().messages.map(m => ({
+          role: "user",
+          content: m
+        }))
 
         const response = await fetch("/api/chat", {
           method: "POST",
@@ -212,43 +225,74 @@ export const useEditorStore = create<StoreState>((set, get) => ({
               role: "user",
               content: prompt
             },
-            messages: formattedMessages.map(x => ({
-              role: "user",
-              content: x
-            }))
+            messages: formattedMessages
           })
         });
 
         if (!response.ok || !response.body) {
-          throw new Error("Failed to stream chat response");
+          toast.error("Failed to stream chat response")
+          return
         }
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let done = false;
-        let streamedContent = "";
+        let buffer = "";
+        let fullResponse = "";
 
         while (!done) {
           const { value, done: readerDone } = await reader.read();
           done = readerDone;
+
           if (value) {
             const chunk = decoder.decode(value);
-            streamedContent += chunk;
+            buffer += chunk;
+            fullResponse += chunk;
+
+            let match;
+            const actionRegex = /<boltAction\s+type="([^"]*)"(?:\s+filePath="([^"]*)")?>([\s\S]*?)<\/boltAction>/g;
+
+            while ((match = actionRegex.exec(buffer)) !== null) {
+              const [, type, filePath, content] = match;
+
+              buffer = buffer.slice(actionRegex.lastIndex);
+
+              const code = content.trim();
+
+              if (type === "file" && filePath) {
+                const step: BuildStep = {
+                  id: crypto.randomUUID(),
+                  title: getTitleFromFile(filePath),
+                  description: getDescriptionFromFile(filePath),
+                  type: BuildStepType.CreateFile,
+                  status: statusType.InProgress,
+                  code,
+                  path: filePath,
+                };
+
+                get().setBuildSteps([step]);
+                get().executeSteps([step]); 
+              }
+
+              if (type === "shell") {
+                const step: BuildStep = {
+                  id: crypto.randomUUID(),
+                  title: "Run shell command",
+                  description: code,
+                  type: BuildStepType.RunScript,
+                  status: statusType.InProgress,
+                  code,
+                };
+
+                get().setBuildSteps([step]);
+                get().executeSteps([step]);
+              }
+            }
+
+            set((state) => ({ data: state.data + chunk }));
           }
         }
-
-        get().setMessages({
-          role: "assistant",
-          content: streamedContent
-        });
-
-        const parsedResponse = parseXml(streamedContent).map((x: BuildStep) => ({
-          ...x,
-          status: statusType.InProgress
-        }));
-
-        get().setBuildSteps(parsedResponse);
-        await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false));
+        get().setMessages(fullResponse);
       } catch (err) {
         console.error("Error during build:", err)
       } finally {
@@ -256,35 +300,95 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       }
     },
 
-    processFollowupPrompts: async (prompt, messages) => {
-      set({isProcessingFollowups: true})
+    processFollowupPrompts: async (prompt) => {
+      set({ isProcessingFollowups: true });
+
       try {
-        const cleanMessages = messages.filter(Boolean);
-      
-        const response = await axiosInstance.post("/api/chat", {
-          prompt: {
-            role: "user",
-            content: prompt
+        const cleanMessages = get().messages.filter(Boolean).map(m => ({
+          role: "assistant",
+          content: m
+        }));
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
           },
-          messages: cleanMessages.map(m => ({
-            role: "assistant",
-            content: m
-          }))
+          body: JSON.stringify({
+            prompt: {
+              role: "user",
+              content: prompt
+            },
+            messages: cleanMessages
+          })
         });
 
-        const parsedResponse: BuildStep[] = parseXml(response.data.response.join('')).map((x: BuildStep) => ({
-          ...x,
-          status: statusType.InProgress
-        }));
+        if (!response.ok || !response.body) {
+          toast.error("Failed to stream follow-up response");
+          return;
+        }
 
-        get().setBuildSteps(parsedResponse);
-        await get().executeSteps(parsedResponse.filter(step => step.shouldExecute !== false));
-        
-        get().setMessages(cleanMessages as unknown as ChatMessage);
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let done = false;
+        let buffer = "";
+        let fullResponse = ""
+
+        while (!done) {
+          const { value, done: readerDone } = await reader.read();
+          done = readerDone;
+
+          if (value) {
+            const chunk = decoder.decode(value);
+            buffer += chunk;
+            fullResponse += chunk;
+
+            let match;
+            const actionRegex = /<boltAction\s+type="([^"]*)"(?:\s+filePath="([^"]*)")?>([\s\S]*?)<\/boltAction>/g;
+
+            while ((match = actionRegex.exec(buffer)) !== null) {
+              const [, type, filePath, content] = match;
+              buffer = buffer.slice(actionRegex.lastIndex);
+
+              const code = content.trim();
+
+              if (type === "file" && filePath) {
+                const step: BuildStep = {
+                  id: crypto.randomUUID(),
+                  title: getTitleFromFile(filePath),
+                  description: getDescriptionFromFile(filePath),
+                  type: BuildStepType.CreateFile,
+                  status: statusType.InProgress,
+                  code,
+                  path: filePath,
+                };
+
+                get().setBuildSteps([step]);
+                get().executeSteps([step]);
+              }
+
+              if (type === "shell") {
+                const step: BuildStep = {
+                  id: crypto.randomUUID(),
+                  title: "Run shell command",
+                  description: code,
+                  type: BuildStepType.RunScript,
+                  status: statusType.InProgress,
+                  code,
+                };
+
+                get().setBuildSteps([step]);
+                get().executeSteps([step]);
+              }
+            }
+          }
+        }
+
+        get().setMessages(fullResponse);
+
       } catch (error) {
         console.error("Error processing followup prompt:", error);
       } finally {
-        set({isProcessingFollowups: false})
+        set({ isProcessingFollowups: false });
       }
     }
 }))

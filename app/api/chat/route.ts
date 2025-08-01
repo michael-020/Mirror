@@ -10,14 +10,13 @@ export async function POST(req: NextRequest){
             role: msg.role,
             content: msg.content
         }))
-
         const formatedMessages = [
             {
                 role: "system",
                 content: getSystemPrompt()
             },
+            ...inputMessages,
             prompt,
-            inputMessages
         ]
         
         const completion = await openai.chat.completions.create({

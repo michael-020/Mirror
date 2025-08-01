@@ -6,18 +6,15 @@ import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucid
 import { BuildStepType, statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
-  const { buildSteps, isBuilding, processFollowupPrompts, messages, isProcessing, isProcessingFollowups } = useEditorStore()
+  const { buildSteps, isBuilding, processFollowupPrompts, isProcessing, isProcessingFollowups } = useEditorStore()
   const [prompt, setPrompt] = useState("")
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!prompt.trim()) return
     
-    const messageHistory = messages.filter(msg => msg !== null);
-    
     processFollowupPrompts(
-      prompt, 
-      messageHistory
+      prompt
     );
     
     setPrompt("") 
