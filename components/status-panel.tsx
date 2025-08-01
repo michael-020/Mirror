@@ -6,7 +6,7 @@ import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucid
 import { BuildStepType, statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
-  const { buildSteps, isBuilding, processFollowupPrompts, isProcessing, isProcessingFollowups } = useEditorStore()
+  const { buildSteps, isBuilding, processFollowupPrompts, isProcessing, isProcessingFollowups, promptStepsMap } = useEditorStore()
   const [prompt, setPrompt] = useState("")
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,10 +37,6 @@ export function StatusPanel() {
   const totalSteps = buildSteps.length
   const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
 
-  // useEffect(() => {
-  //   useMountFilesToWebContainer()
-  // }, [files])
-
   return (
     <div className="h-[94vh] flex flex-col">
       <div className="p-4 border-b border-gray-700">
@@ -65,16 +61,34 @@ export function StatusPanel() {
         )}
       </div>
 
-      <div className="flex-1 overflow-auto p-4 space-y-2 custom-scrollbar">
-        {buildSteps.filter(step => step.shouldExecute !== false).map((step) => (
-            <div key={step.id} className="flex items-start gap-3 py-0.5 group">
-              {getStatusIcon(step.status)}
-              <div className="flex-1 min-w-0 flex flex-col">
-                <p className="text-sm text-gray-300 group-hover:text-white transition-colors">
-                  {step.type === BuildStepType.RunScript ? step.description :  step.title}
+      <div className="flex-1 overflow-auto p-4 space-y-4 custom-scrollbar">
+        {Array.from(promptStepsMap.entries()).map(([promptIndex, { prompt, steps }]) => (
+          <div key={promptIndex} className="space-y-3">
+            {/* Render Input Prompt (aligned to the right) */}
+            <div className="flex items-start gap-3 justify-end mb-3">
+              <div className="flex-1 bg-blue-600 rounded-lg rounded-tr-none p-3 max-w-[80%] ml-auto">
+                <p className="text-sm text-white break-words">
+                  {prompt}
                 </p>
               </div>
             </div>
+            
+            {/* Render Build Steps for this prompt */}
+            {steps.length > 0 && (
+              <div className="space-y-2 ml-2">
+                {steps.filter(step => step.shouldExecute !== false).map((step) => (
+                  <div key={step.id} className="flex items-start gap-3 py-0.5 group">
+                    {getStatusIcon(step.status)}
+                    <div className="flex-1 min-w-0 flex flex-col">
+                      <p className="text-sm text-gray-300 group-hover:text-white transition-colors">
+                        {step.type === BuildStepType.RunScript ? step.description : step.title}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
 
         {isProcessing && (

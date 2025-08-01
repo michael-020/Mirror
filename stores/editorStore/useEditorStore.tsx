@@ -20,7 +20,8 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   isInitialising: false,
   isProcessing: false,
   isProcessingFollowups: false,
-  data: "",
+  inputPrompts: [],
+  promptStepsMap: new Map(),
 
   setWebcontainer: async (instance: WebContainer) => {
     set({ webcontainer: instance })
@@ -52,11 +53,29 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   stopBuild: () => set({ isBuilding: false }),
 
   setStepStatus: (id: string, status: statusType) =>
-    set((state) => ({
-      buildSteps: state.buildSteps.map((step) =>
+    set((state) => {
+      // Update buildSteps
+      const updatedBuildSteps = state.buildSteps.map((step) =>
         step.id === id ? { ...step, status } : step
-      ),
-    })),
+      )
+      
+      // Update promptStepsMap to sync the status
+      const updatedPromptStepsMap = new Map(state.promptStepsMap)
+      updatedPromptStepsMap.forEach((mapping, key) => {
+        const updatedSteps = mapping.steps.map((step) =>
+          step.id === id ? { ...step, status } : step
+        )
+        updatedPromptStepsMap.set(key, {
+          ...mapping,
+          steps: updatedSteps
+        })
+      })
+      
+      return {
+        buildSteps: updatedBuildSteps,
+        promptStepsMap: updatedPromptStepsMap
+      }
+    }),
 
   // File actions
   setSelectedFile: (path) => set({ selectedFile: path }),
@@ -186,8 +205,23 @@ export const useEditorStore = create<StoreState>((set, get) => ({
 
     processPrompt: async (prompt) => {
       set({ isProcessing: true, isInitialising: true })
+      const currentPromptIndex = get().inputPrompts.length
 
       try {
+        set(state => ({
+          inputPrompts: [
+            ...state.inputPrompts,
+            prompt
+          ]
+        }))
+
+        set(state => ({
+          promptStepsMap: new Map(state.promptStepsMap).set(currentPromptIndex, {
+            prompt,
+            steps: []
+          })
+        }))
+
         const res = await axiosInstance.post("/api/template", { 
           prompt: {
             role: "user",
@@ -199,6 +233,17 @@ export const useEditorStore = create<StoreState>((set, get) => ({
           ...x,
           status: statusType.InProgress
         }))
+
+        set(state => {
+          const newMap = new Map(state.promptStepsMap)
+          const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
+          newMap.set(currentPromptIndex, {
+            ...existing,
+            steps: [...existing.steps, ...parsedSteps]
+          })
+          return { promptStepsMap: newMap }
+        })
+
         get().setBuildSteps(parsedSteps)
         get().executeSteps(parsedSteps.filter(step => step.shouldExecute !== false))
 
@@ -269,6 +314,15 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                   code,
                   path: filePath,
                 };
+                set(state => {
+                  const newMap = new Map(state.promptStepsMap)
+                  const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
+                  newMap.set(currentPromptIndex, {
+                    ...existing,
+                    steps: [...existing.steps, step]
+                  })
+                  return { promptStepsMap: newMap }
+                })
 
                 get().setBuildSteps([step]);
                 get().executeSteps([step]); 
@@ -283,13 +337,20 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                   status: statusType.InProgress,
                   code,
                 };
+                set(state => {
+                  const newMap = new Map(state.promptStepsMap)
+                  const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
+                  newMap.set(currentPromptIndex, {
+                    ...existing,
+                    steps: [...existing.steps, step]
+                  })
+                  return { promptStepsMap: newMap }
+                })
 
                 get().setBuildSteps([step]);
                 get().executeSteps([step]);
               }
             }
-
-            set((state) => ({ data: state.data + chunk }));
           }
         }
         get().setMessages(fullResponse);
@@ -302,8 +363,21 @@ export const useEditorStore = create<StoreState>((set, get) => ({
 
     processFollowupPrompts: async (prompt) => {
       set({ isProcessingFollowups: true });
-
+      const currentPromptIndex = get().inputPrompts.length
       try {
+        set(state => ({
+          inputPrompts: [
+            ...state.inputPrompts,
+            prompt
+          ]
+        }))
+        set(state => ({
+          promptStepsMap: new Map(state.promptStepsMap).set(currentPromptIndex, {
+            prompt,
+            steps: []
+          })
+        }))
+
         const cleanMessages = get().messages.filter(Boolean).map(m => ({
           role: "assistant",
           content: m
@@ -361,6 +435,15 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                   code,
                   path: filePath,
                 };
+                set(state => {
+                  const newMap = new Map(state.promptStepsMap)
+                  const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
+                  newMap.set(currentPromptIndex, {
+                    ...existing,
+                    steps: [...existing.steps, step]
+                  })
+                  return { promptStepsMap: newMap }
+                })
 
                 get().setBuildSteps([step]);
                 get().executeSteps([step]);
@@ -375,6 +458,15 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                   status: statusType.InProgress,
                   code,
                 };
+                 set(state => {
+                  const newMap = new Map(state.promptStepsMap)
+                  const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
+                  newMap.set(currentPromptIndex, {
+                    ...existing,
+                    steps: [...existing.steps, step]
+                  })
+                  return { promptStepsMap: newMap }
+                })
 
                 get().setBuildSteps([step]);
                 get().executeSteps([step]);

@@ -42,6 +42,10 @@ export interface FileContent {
     path: string
 }
 
+export interface PromptStepMapping {
+    prompt: string
+    steps: BuildStep[]
+}
 
 export interface StoreState {
     // Build status
@@ -59,7 +63,8 @@ export interface StoreState {
     shellCommands: string[]
     webcontainer: WebContainer | null;
     messages: string[]
-    data: string
+    inputPrompts: string[]
+    promptStepsMap: Map<number, PromptStepMapping>
 
     // Actions
     setWebcontainer: (instance: WebContainer) => void;
