@@ -1,10 +1,8 @@
-"use client"
-
 import { create } from "zustand"
 import { BuildStep, BuildStepType, FileItemFlat, statusType, StoreState } from "./types"
 import { axiosInstance } from "@/lib/axios"
 import { getDescriptionFromFile, getTitleFromFile, parseXml } from "@/lib/steps"
-import { WebContainer } from "@webcontainer/api"
+import { WebContainer, WebContainerProcess } from "@webcontainer/api"
 import toast from "react-hot-toast"
 
 export const useEditorStore = create<StoreState>((set, get) => ({
@@ -22,6 +20,8 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   isProcessingFollowups: false,
   inputPrompts: [],
   promptStepsMap: new Map(),
+  previewUrl: "",
+  devServerProcess: null,
 
   setWebcontainer: async (instance: WebContainer) => {
     set({ webcontainer: instance })
@@ -128,12 +128,62 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         }
       }),
 
-    setShellCommand: (command: string) =>
+    setShellCommand: (command: string) =>{
+      console.log("command added: ", command)
       set((state) => ({
         shellCommands: [...state.shellCommands, command],
-      })),
+      }))
+    },
+
+    setPreviewUrl: (url: string) => {
+      set({previewUrl: url})
+    },
+
+    setDevServerProcess: (proc: WebContainerProcess) => set({ devServerProcess: proc }),
+
+    handleShellCommand: async (command: string) => {
+      const { webcontainer, devServerProcess, setPreviewUrl, setDevServerProcess } = get()
+      if (!webcontainer) return
+
+      const parts = command.split("&&").map(p => p.trim())
+
+      for (const cmd of parts) {
+        if (cmd.startsWith("npm install")) {
+          const proc = await webcontainer.spawn("npm", ["install"])
+          await proc.exit
+        } 
+        
+        else if (cmd.startsWith("npm run dev")) {
+          // Kill existing dev server
+          if (devServerProcess) {
+            try {
+              devServerProcess.kill()
+            } catch (err) {
+              console.warn("Failed to kill dev server:", err)
+            }
+          }
+
+          const devProc = await webcontainer.spawn("npm", ["run", "dev"])
+          setDevServerProcess(devProc)
+
+          devProc.output.pipeTo(new WritableStream({ write() {} })) // optional
+
+          webcontainer.on("server-ready", (port, url) => {
+            console.log("Dev server ready at:", url)
+            setPreviewUrl(url)
+          })
+        }
+
+        else {
+          // Run any other shell command
+          const args = cmd.split(" ")
+          const proc = await webcontainer.spawn(args[0], args.slice(1))
+          await proc.exit
+        }
+      }
+    },
     
-    executeSteps: (steps: BuildStep[]) => {
+    executeSteps: async (steps: BuildStep[]) => {
       const { setStepStatus, addFile, addFileItem } = get()
       console.log("executing steps")
       for (const step of steps) {
@@ -183,6 +233,7 @@ export const useEditorStore = create<StoreState>((set, get) => ({
               if (step.description) {
                 console.log("Shell command to execute:", step.description)
                 get().setShellCommand(step.description)
+                await get().handleShellCommand(step.description)
               }
               break
             }

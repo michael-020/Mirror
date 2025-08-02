@@ -2,12 +2,11 @@
 
 import { useEditorStore } from "@/stores/editorStore/useEditorStore";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 
 export function PreviewPanel() {
-    const { webcontainer } = useEditorStore()
-    const [url, setUrl] = useState("")
+    const { webcontainer, previewUrl, setPreviewUrl } = useEditorStore()
 
     async function main(){
         if(!webcontainer) {
@@ -28,7 +27,7 @@ export function PreviewPanel() {
 
         webcontainer!.on('server-ready', (port, url) => {
             console.log("url: ", url)
-            setUrl(url)
+            setPreviewUrl(url)
         });
     }
 
@@ -38,14 +37,14 @@ export function PreviewPanel() {
     
     return (
         <div className="h-[calc(100vh-4rem)] overflow-hidden"> 
-            {!url ? 
+            {!previewUrl ? 
                 <div className="h-full w-full items-center justify-center flex flex-col gap-4"> 
                     <Loader2 className="animate-spin size-10" />
                     <div className="text-xl">Generating preview</div>
                 </div>
             : 
                 <iframe 
-                    src={url}
+                    src={previewUrl}
                     className="w-full h-full"
                     title="Preview"
                     sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"

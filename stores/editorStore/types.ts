@@ -1,4 +1,4 @@
-import { WebContainer } from "@webcontainer/api"
+import { WebContainer, WebContainerProcess } from "@webcontainer/api"
 
 export interface BuildStep {
     id: string
@@ -65,6 +65,8 @@ export interface StoreState {
     messages: string[]
     inputPrompts: string[]
     promptStepsMap: Map<number, PromptStepMapping>
+    previewUrl: string
+    devServerProcess: WebContainerProcess | null
 
     // Actions
     setWebcontainer: (instance: WebContainer) => void;
@@ -84,4 +86,7 @@ export interface StoreState {
     setShellCommand: (command: string) => void;
     setMessages: (messages: string | string[]) => void;
     processFollowupPrompts: (prompt: string) => void;
+    setPreviewUrl: (url: string) => void;
+    setDevServerProcess: (proc: WebContainerProcess) => void
+    handleShellCommand: (command: string) => Promise<void>
 }
