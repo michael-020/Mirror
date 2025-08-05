@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useEditorStore } from "@/stores/editorStore/useEditorStore"
 import Editor from '@monaco-editor/react';
 
@@ -9,24 +9,53 @@ interface EditorPanelProps {
 }
 
 export function EditorPanel({ filePath }: EditorPanelProps) {
-  const { files, updateFileContent } = useEditorStore()
+  const { files, updateFileContent, streamingFiles, userEditedFiles } = useEditorStore()
   const [editorValue, setEditorValue] = useState("")
+  const isUserEditingRef = useRef(false)
+  const lastStreamedContentRef = useRef("")
 
   const file = files[filePath]
+  const isStreaming = streamingFiles?.get(filePath) || false
+  const isUserEdited = userEditedFiles?.has(filePath) || false
 
   useEffect(() => {
     if (file?.content !== undefined) {
-      setEditorValue(file.content)
+      // Only update editor if user hasn't manually edited or if content changed significantly
+      if (!isUserEditingRef.current) {
+        // For streaming files, only update if content is significantly different
+        if (isStreaming) {
+          const contentDiff = file.content.length - lastStreamedContentRef.current.length
+          if (contentDiff > 50 || file.content !== lastStreamedContentRef.current) {
+            setEditorValue(file.content)
+            lastStreamedContentRef.current = file.content
+          }
+        } else {
+          setEditorValue(file.content)
+        }
+      }
     }
-  }, [file?.content])
+  }, [file?.content, isStreaming])
 
   const handleEditorChange = (value: string | undefined) => {
     const newValue = value || ""
+    isUserEditingRef.current = true
     setEditorValue(newValue)
-    updateFileContent(filePath, newValue)
+    
+    // Debounce the store update to avoid conflicts during rapid typing
+    const timeoutId = setTimeout(() => {
+      updateFileContent(filePath, newValue)
+      isUserEditingRef.current = false
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
   }
 
-  
+  // Reset user editing flag when file path changes
+  useEffect(() => {
+    isUserEditingRef.current = false
+    lastStreamedContentRef.current = ""
+  }, [filePath])
+
   if (!file) {
     return (
       <div className="h-full flex items-center justify-center text-gray-500">
@@ -36,48 +65,61 @@ export function EditorPanel({ filePath }: EditorPanelProps) {
   }
 
   return (
-    <div className="h-full">
-        <div className="h-full">
-          <Editor
-            height="100%"
-            value={editorValue}
-            defaultLanguage="typescript"
-            onChange={handleEditorChange}
-            theme="vs-dark"
-            options={{
-              readOnly: false,
-              minimap: { enabled: false },
-              fontSize: 14,
-              wordWrap: 'on',
-              scrollBeyondLastLine: false,
-            }}
-            beforeMount={(monaco) => {
-              monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-                noSemanticValidation: true,
-                noSyntaxValidation: true,
-              });
-
-              monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-                noSemanticValidation: true,
-                noSyntaxValidation: true,
-              });
-
-              monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-                jsx: monaco.languages.typescript.JsxEmit.React,
-                allowJs: true,
-                esModuleInterop: true,
-                target: monaco.languages.typescript.ScriptTarget.ESNext,
-                module: monaco.languages.typescript.ModuleKind.ESNext,
-                moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-                skipLibCheck: true,
-                isolatedModules: true,
-                allowSyntheticDefaultImports: true,
-                noEmit: true,
-                typeRoots: [], 
-              });
-            }}
-          />
+    <div className="h-full relative">
+      {/* Streaming indicator */}
+      {isStreaming && !isUserEdited && (
+        <div className="absolute top-2 right-2 z-10 bg-blue-500 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+          Streaming...
         </div>
+      )}
+      
+      <div className="h-full">
+        <Editor
+          height="100%"
+          value={editorValue}
+          defaultLanguage="typescript"
+          onChange={handleEditorChange}
+          theme="vs-dark"
+          options={{
+            readOnly: false,
+            minimap: { enabled: false },
+            fontSize: 14,
+            wordWrap: 'on',
+            scrollBeyondLastLine: false,
+            // Disable some features during streaming to improve performance
+            quickSuggestions: !isStreaming,
+            parameterHints: { enabled: !isStreaming },
+            suggestOnTriggerCharacters: !isStreaming,
+          }}
+          beforeMount={(monaco) => {
+            monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+              noSemanticValidation: true,
+              noSyntaxValidation: true,
+            });
+
+            monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+              noSemanticValidation: true,
+              noSyntaxValidation: true,
+            });
+
+            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+              jsx: monaco.languages.typescript.JsxEmit.React,
+              allowJs: true,
+              esModuleInterop: true,
+              target: monaco.languages.typescript.ScriptTarget.ESNext,
+              module: monaco.languages.typescript.ModuleKind.ESNext,
+              moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+              skipLibCheck: true,
+              isolatedModules: true,
+              allowSyntheticDefaultImports: true,
+              noEmit: true,
+              typeRoots: [], 
+            });
+          }}
+          
+        />
+      </div>
     </div>
   )
 }

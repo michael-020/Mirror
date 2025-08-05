@@ -235,7 +235,7 @@ export function FileExplorer() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scrollbar-hidden">
         {filteredTree.map((item) => (
           <FileTreeItem
             key={item.path}

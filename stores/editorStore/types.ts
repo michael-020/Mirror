@@ -67,6 +67,8 @@ export interface StoreState {
     promptStepsMap: Map<number, PromptStepMapping>
     previewUrl: string
     devServerProcess: WebContainerProcess | null
+    streamingFiles: Map<string, boolean>
+    userEditedFiles: Set<string>
 
     // Actions
     setWebcontainer: (instance: WebContainer) => void;
@@ -89,4 +91,7 @@ export interface StoreState {
     setPreviewUrl: (url: string) => void;
     setDevServerProcess: (proc: WebContainerProcess) => void
     handleShellCommand: (command: string) => Promise<void>
+    streamFileContent: (path: string, chunk: string) => void;
+    completeFileStreaming: (path: string) => void;
+    resetUserEditedFiles: () => void;
 }

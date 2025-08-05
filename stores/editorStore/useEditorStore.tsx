@@ -22,6 +22,8 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   promptStepsMap: new Map(),
   previewUrl: "",
   devServerProcess: null,
+  streamingFiles: new Map(),
+  userEditedFiles: new Set(),
 
   setWebcontainer: async (instance: WebContainer) => {
     set({ webcontainer: instance })
@@ -81,31 +83,75 @@ export const useEditorStore = create<StoreState>((set, get) => ({
   setSelectedFile: (path) => set({ selectedFile: path }),
 
   updateFileContent: (path, content) =>
-    set((state) => ({
-      files: {
-        ...state.files,
-        [path]: {
-          ...state.files[path],
-          content,
+    set((state) => {
+      // Mark file as user-edited and stop streaming
+      const newUserEditedFiles = new Set(state.userEditedFiles)
+      newUserEditedFiles.add(path)
+      
+      const newStreamingFiles = new Map(state.streamingFiles)
+      newStreamingFiles.set(path, false)
+
+      return {
+        userEditedFiles: newUserEditedFiles,
+        streamingFiles: newStreamingFiles,
+        files: {
+          ...state.files,
+          [path]: {
+            ...state.files[path],
+            content,
+          },
         },
-      },
+      }
+    }),
+
+    // Add method to stream file content
+   streamFileContent: (path: string, chunk: string) =>
+    set((state) => {
+      // Don't stream to files that user has edited
+      if (state.userEditedFiles.has(path)) {
+        return state
+      }
+
+      // Only proceed if file is marked as streaming
+      if (!state.streamingFiles.get(path)) {
+        return state
+      }
+
+      const currentContent = state.files[path]?.content || ""
+      return {
+        files: {
+          ...state.files,
+          [path]: {
+            ...state.files[path],
+            name: path.split("/").pop() || path,
+            path,
+            content: currentContent + chunk,
+          },
+        },
+      }
+    }),
+
+     startFileStreaming: (path: string) =>
+    set((state) => ({
+      streamingFiles: new Map(state.streamingFiles).set(path, true)
     })),
+
+  // Method to reset streaming state when file is complete
+  completeFileStreaming: (path: string) =>
+    set((state) => ({
+      streamingFiles: new Map(state.streamingFiles).set(path, false)
+    })),
+
+  // Reset user edited state (call when starting new build)
+  resetUserEditedFiles: () =>
+    set({ userEditedFiles: new Set() }),
 
     setFileItems: (items: FileItemFlat[]) => set({ fileItems: items }),
     
     setFiles: (files) => set({ files }),
 
-    addFile: (path: string, content: string) =>{
-      set((state) => ({
-        files: {
-          ...state.files,
-          [path]: {
-            name: path.split("/").pop() || path,
-            path,
-          },
-        },
-      }))
-      set({selectedFile: path})
+    addFile: (path: string, content: string = "") => {
+      
       set((state) => ({
           files: {
             ...state.files,
@@ -151,6 +197,15 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         if (cmd.startsWith("npm install")) {
           const proc = await webcontainer.spawn("npm", ["install"])
           await proc.exit
+          const devProc = await webcontainer.spawn("npm", ["run", "dev"])
+          setDevServerProcess(devProc)
+
+          devProc.output.pipeTo(new WritableStream({ write() {} })) 
+
+          webcontainer.on("server-ready", (port, url) => {
+            console.log("Dev server ready at:", url)
+            setPreviewUrl(url)
+          })
         } 
         
         else if (cmd.startsWith("npm run dev")) {
@@ -162,7 +217,8 @@ export const useEditorStore = create<StoreState>((set, get) => ({
               console.warn("Failed to kill dev server:", err)
             }
           }
-
+          const proc = await webcontainer.spawn("npm", ["install"])
+          await proc.exit
           const devProc = await webcontainer.spawn("npm", ["run", "dev"])
           setDevServerProcess(devProc)
 
@@ -201,7 +257,6 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                 console.error("CreateFile step missing path or code:", step)
                 throw new Error("Missing path or code")
               }
-
               addFile(step.path, step.code)
 
               addFileItem({
@@ -335,6 +390,8 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         let done = false;
         let buffer = "";
         let fullResponse = "";
+        // Separate map for tracking file completion - this one uses objects
+        const fileCompletionTracker = new Map<string, { step: BuildStep, content: string, isComplete: boolean }>();
 
         while (!done) {
           const { value, done: readerDone } = await reader.read();
@@ -345,17 +402,38 @@ export const useEditorStore = create<StoreState>((set, get) => ({
             buffer += chunk;
             fullResponse += chunk;
 
+            // Process streaming content for files that are still streaming
+            fileCompletionTracker.forEach((fileData, filePath) => {
+              if (!fileData.isComplete && !get().userEditedFiles.has(filePath)) {
+                // Only stream if file is still marked as streaming
+                if (get().streamingFiles.get(filePath)) {
+                  // Limit chunk size to avoid overwhelming the editor
+                  const chunkSize = Math.min(chunk.length, 100)
+                  const limitedChunk = chunk.substring(0, chunkSize)
+                  get().streamFileContent(filePath, limitedChunk);
+                }
+              }
+            });
+
+            // Process complete actions
             let match;
             const actionRegex = /<boltAction\s+type="([^"]*)"(?:\s+filePath="([^"]*)")?>([\s\S]*?)<\/boltAction>/g;
 
             while ((match = actionRegex.exec(buffer)) !== null) {
               const [, type, filePath, content] = match;
-
               buffer = buffer.slice(actionRegex.lastIndex);
 
               const code = content.trim();
 
               if (type === "file" && filePath) {
+                // Mark file as complete in our tracker
+                if (fileCompletionTracker.has(filePath)) {
+                  fileCompletionTracker.get(filePath)!.isComplete = true;
+                }
+
+                // Complete the file streaming
+                get().completeFileStreaming(filePath);
+
                 const step: BuildStep = {
                   id: crypto.randomUUID(),
                   title: getTitleFromFile(filePath),
@@ -365,6 +443,10 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                   code,
                   path: filePath,
                 };
+
+                // Set final content (this will also mark as user-edited to prevent further streaming)
+                get().addFile(filePath, code);
+
                 set(state => {
                   const newMap = new Map(state.promptStepsMap)
                   const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
@@ -376,6 +458,7 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                 })
 
                 get().setBuildSteps([step]);
+                get().setSelectedFile(step.path as string);
                 get().executeSteps([step]); 
               }
 
@@ -388,6 +471,7 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                   status: statusType.InProgress,
                   code,
                 };
+
                 set(state => {
                   const newMap = new Map(state.promptStepsMap)
                   const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
@@ -402,8 +486,57 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                 get().executeSteps([step]);
               }
             }
+
+            // Check for new incomplete file actions
+            const incompleteActionRegex = /<boltAction\s+type="file"\s+filePath="([^"]*)">/g;
+            let incompleteMatch;
+            while ((incompleteMatch = incompleteActionRegex.exec(buffer)) !== null) {
+              const [, filePath] = incompleteMatch;
+              
+              if (!fileCompletionTracker.has(filePath)) {
+                // Initialize file for streaming
+                get().addFile(filePath, "");
+                get().addFileItem({
+                  name: filePath.split("/").pop() || filePath,
+                  path: filePath,
+                  type: "file",
+                  content: ""
+                });
+                get().setSelectedFile(filePath);
+
+                const step: BuildStep = {
+                  id: crypto.randomUUID(),
+                  title: getTitleFromFile(filePath),
+                  description: getDescriptionFromFile(filePath),
+                  type: BuildStepType.CreateFile,
+                  status: statusType.InProgress,
+                  code: "",
+                  path: filePath,
+                };
+
+                // Add to completion tracker
+                fileCompletionTracker.set(filePath, { 
+                  step, 
+                  content: "", 
+                  isComplete: false 
+                });
+                
+                // Mark file as streaming in the store
+                set(state => ({
+                  streamingFiles: new Map(state.streamingFiles).set(filePath, true)
+                }));
+                
+                get().setBuildSteps([step]);
+              }
+            }
           }
         }
+
+        // Mark all files as no longer streaming
+        fileCompletionTracker.forEach((_, filePath) => {
+          get().completeFileStreaming(filePath);
+        });
+
         get().setMessages(fullResponse);
       } catch (err) {
         console.error("Error during build:", err)
@@ -448,15 +581,17 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         });
 
         if (!response.ok || !response.body) {
-          toast.error("Failed to stream follow-up response");
-          return;
+          toast.error("Failed to stream chat response")
+          return
         }
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let done = false;
         let buffer = "";
-        let fullResponse = ""
+        let fullResponse = "";
+        // Separate map for tracking file completion - this one uses objects
+        const fileCompletionTracker = new Map<string, { step: BuildStep, content: string, isComplete: boolean }>();
 
         while (!done) {
           const { value, done: readerDone } = await reader.read();
@@ -467,6 +602,20 @@ export const useEditorStore = create<StoreState>((set, get) => ({
             buffer += chunk;
             fullResponse += chunk;
 
+            // Process streaming content for files that are still streaming
+            fileCompletionTracker.forEach((fileData, filePath) => {
+              if (!fileData.isComplete && !get().userEditedFiles.has(filePath)) {
+                // Only stream if file is still marked as streaming
+                if (get().streamingFiles.get(filePath)) {
+                  // Limit chunk size to avoid overwhelming the editor
+                  const chunkSize = Math.min(chunk.length, 100)
+                  const limitedChunk = chunk.substring(0, chunkSize)
+                  get().streamFileContent(filePath, limitedChunk);
+                }
+              }
+            });
+
+            // Process complete actions
             let match;
             const actionRegex = /<boltAction\s+type="([^"]*)"(?:\s+filePath="([^"]*)")?>([\s\S]*?)<\/boltAction>/g;
 
@@ -477,6 +626,14 @@ export const useEditorStore = create<StoreState>((set, get) => ({
               const code = content.trim();
 
               if (type === "file" && filePath) {
+                // Mark file as complete in our tracker
+                if (fileCompletionTracker.has(filePath)) {
+                  fileCompletionTracker.get(filePath)!.isComplete = true;
+                }
+
+                // Complete the file streaming
+                get().completeFileStreaming(filePath);
+
                 const step: BuildStep = {
                   id: crypto.randomUUID(),
                   title: getTitleFromFile(filePath),
@@ -486,6 +643,35 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                   code,
                   path: filePath,
                 };
+
+                // Set final content (this will also mark as user-edited to prevent further streaming)
+                get().addFile(filePath, code);
+
+                set(state => {
+                  const newMap = new Map(state.promptStepsMap)
+                  const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
+                  newMap.set(currentPromptIndex, {
+                    ...existing,
+                    steps: [...existing.steps, step]
+                  })
+                  return { promptStepsMap: newMap }
+                })
+
+                get().setBuildSteps([step]);
+                get().setSelectedFile(step.path as string);
+                get().executeSteps([step]); 
+              }
+
+              if (type === "shell") {
+                const step: BuildStep = {
+                  id: crypto.randomUUID(),
+                  title: "Run shell command",
+                  description: code,
+                  type: BuildStepType.RunScript,
+                  status: statusType.InProgress,
+                  code,
+                };
+
                 set(state => {
                   const newMap = new Map(state.promptStepsMap)
                   const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
@@ -499,35 +685,59 @@ export const useEditorStore = create<StoreState>((set, get) => ({
                 get().setBuildSteps([step]);
                 get().executeSteps([step]);
               }
+            }
 
-              if (type === "shell") {
+            // Check for new incomplete file actions
+            const incompleteActionRegex = /<boltAction\s+type="file"\s+filePath="([^"]*)">/g;
+            let incompleteMatch;
+            while ((incompleteMatch = incompleteActionRegex.exec(buffer)) !== null) {
+              const [, filePath] = incompleteMatch;
+              
+              if (!fileCompletionTracker.has(filePath)) {
+                // Initialize file for streaming
+                get().addFile(filePath, "");
+                get().addFileItem({
+                  name: filePath.split("/").pop() || filePath,
+                  path: filePath,
+                  type: "file",
+                  content: ""
+                });
+                get().setSelectedFile(filePath);
+
                 const step: BuildStep = {
                   id: crypto.randomUUID(),
-                  title: "Run shell command",
-                  description: code,
-                  type: BuildStepType.RunScript,
+                  title: getTitleFromFile(filePath),
+                  description: getDescriptionFromFile(filePath),
+                  type: BuildStepType.CreateFile,
                   status: statusType.InProgress,
-                  code,
+                  code: "",
+                  path: filePath,
                 };
-                 set(state => {
-                  const newMap = new Map(state.promptStepsMap)
-                  const existing = newMap.get(currentPromptIndex) || { prompt, steps: [] }
-                  newMap.set(currentPromptIndex, {
-                    ...existing,
-                    steps: [...existing.steps, step]
-                  })
-                  return { promptStepsMap: newMap }
-                })
 
+                // Add to completion tracker
+                fileCompletionTracker.set(filePath, { 
+                  step, 
+                  content: "", 
+                  isComplete: false 
+                });
+                
+                // Mark file as streaming in the store
+                set(state => ({
+                  streamingFiles: new Map(state.streamingFiles).set(filePath, true)
+                }));
+                
                 get().setBuildSteps([step]);
-                get().executeSteps([step]);
               }
             }
           }
         }
 
-        get().setMessages(fullResponse);
+        // Mark all files as no longer streaming
+        fileCompletionTracker.forEach((_, filePath) => {
+          get().completeFileStreaming(filePath);
+        });
 
+        get().setMessages(fullResponse);
       } catch (error) {
         console.error("Error processing followup prompt:", error);
       } finally {

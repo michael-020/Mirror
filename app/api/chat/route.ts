@@ -23,7 +23,7 @@ export async function POST(req: NextRequest){
             model: "gemini-2.5-flash",
             messages: formatedMessages,
             stream: true,
-            max_completion_tokens: 100000
+            max_completion_tokens: 800000
         });
        
         const encoder = new TextEncoder();
