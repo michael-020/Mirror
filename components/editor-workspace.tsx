@@ -6,6 +6,7 @@ import { CodeEditorTabs } from "./code-editor-tabs"
 import { EditorPanel } from "./editor-pannel"
 import { PreviewPanel } from "./preview-pannel"
 import { EditorErrorBoundary } from "./editor-error-boundary"
+import { FileExplorer } from "./file-explorer"
 
 export function EditorWorkspace() {
   const { selectedFile } = useEditorStore()
@@ -27,12 +28,22 @@ export function EditorWorkspace() {
       <CodeEditorTabs activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="flex-1 overflow-hidden">
         {activeTab === "code" ? (
-          <EditorErrorBoundary>
-            <EditorPanel filePath={selectedFile} />
-          </EditorErrorBoundary>
+          <div className="h-full flex">
+            {/* File Explorer */}
+            <div className="w-64 border-r border-neutral-700">
+              <FileExplorer />
+            </div>
+            
+            {/* Code Editor */}
+            <div className="flex-1">
+              <EditorErrorBoundary>
+                <EditorPanel filePath={selectedFile} />
+              </EditorErrorBoundary>
+            </div>
+          </div>
         ) : (
           <div className="h-full">
-              <PreviewPanel />
+            <PreviewPanel />
           </div>
         )}
       </div>

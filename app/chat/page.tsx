@@ -76,17 +76,12 @@ export default function ChatPage() {
         {/* Main Content - 3 Column Grid */}
         <div className="flex-1 grid grid-cols-12 gap-0">
           {/* Left Column - Status Panel */}
-          <div className="col-span-2 bg-neutral-950 border-r border-neutral-700">
+          <div className="col-span-3 bg-neutral-950 border-r border-neutral-700">
             <StatusPanel />
           </div>
 
-          {/* Middle Column - File Explorer */}
-          <div className="col-span-2 bg-neutral-950 border-r border-neutral-700">
-            <FileExplorer />
-          </div>
-
           {/* Right Column - Code Editor & Preview */}
-          <div className="col-span-8 bg-neutral-900">
+          <div className="col-span-9 bg-neutral-900">
             <EditorWorkspace/>
           </div>
         </div>
