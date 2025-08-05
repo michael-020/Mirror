@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react"
 import { StatusPanel } from "@/components/status-panel"
-import { FileExplorer } from "@/components/file-explorer"
 import { CreateFileModal } from "@/components/create-file-modal"
 import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
 import { Plus, ArrowLeft } from "lucide-react"
@@ -16,7 +15,6 @@ export default function ChatPage() {
   const { setSelectedFile, fileItems, clearBuildSteps, setFileItems, setFiles, isInitialising } = useStore()
   const hasSelectedInitialFile = useRef(false)
 
-  // Auto-select first file when files are created
   useEffect(() => {
     if (!hasSelectedInitialFile.current && fileItems.length > 0) {
       const firstFile = fileItems.find(f => f.type === "file")

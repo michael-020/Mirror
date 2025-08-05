@@ -1,31 +1,174 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
 import { ChevronRight, ChevronDown, FileIcon, Folder, FolderOpen, Search } from "lucide-react"
 import type { FileItemFlat } from "@/stores/editorStore/types"
 
-interface FileTreeItemProps {
-  item: any
-  level: number
-  onFileSelect: (file: any) => void
-  selectedFile: string | null
-}
+export function FileExplorer() {
+  const { fileItems, selectedFile, setSelectedFile } = useStore()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [activeTab, setActiveTab] = useState<"files" | "search">("files")
 
-interface FileNode {
-  file: {
-    contents: string
+  const handleFileSelect = (file: any) => {
+    setSelectedFile(file.path)
   }
+
+  const filteredAndSortedItems = useMemo(() => {
+    let filtered = fileItems
+
+    if (searchTerm) {
+      filtered = fileItems.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.path.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+
+    return filtered.sort((a, b) => {
+      if (a.type === "folder" && b.type === "file") return -1
+      if (a.type === "file" && b.type === "folder") return 1
+      return a.name.localeCompare(b.name)
+    })
+  }, [fileItems, searchTerm])
+
+  const filteredTree = useMemo(() => {
+    const buildNestedTree = (items: FileItemFlat[]): any[] => {
+      const root: Record<string, any> = {}
+
+      for (const item of items) {
+        const parts = item.path.split("/")
+        let current = root
+
+        for (let i = 0; i < parts.length; i++) {
+          const part = parts[i]
+          const currentPath = parts.slice(0, i + 1).join("/")
+          const isFile = i === parts.length - 1 && item.type === "file"
+
+          if (!current[part]) {
+            current[part] = {
+              name: part,
+              path: currentPath,
+              type: isFile ? "file" : "folder",
+              children: isFile ? undefined : {},
+            }
+          }
+
+          if (!isFile) {
+            current = current[part].children
+          }
+        }
+      }
+
+      const convert = (node: any): any => {
+        return Object.values(node).map((item: any) => ({
+          ...item,
+          children: item.children ? convert(item.children) : undefined,
+        }))
+      }
+
+      return convert(root)
+    }
+
+    return buildNestedTree(filteredAndSortedItems)
+  }, [filteredAndSortedItems])
+
+  return (
+    <div className="h-[calc(100vh-4rem)] flex flex-col custom-scrollbar">
+      {/* Tabs */}
+      <div className="flex border-b border-neutral-700">
+        <button
+          onClick={() => setActiveTab("files")}
+          className={`px-4 py-2 text-sm ${
+            activeTab === "files"
+              ? "text-white"
+              : "text-neutral-500 hover:text-white"
+          }`}
+        >
+          Files
+        </button>
+        <button
+          onClick={() => setActiveTab("search")}
+          className={` px-4 py-2 text-sm ${
+            activeTab === "search"
+              ? "text-white"
+              : "text-neutral-500 hover:text-white"
+          }`}
+        >
+          Search
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === "files" ? (
+        <div className="flex-1 overflow-y-auto">
+          {filteredTree.map((item) => (
+            <FileTreeItem
+              key={item.path}
+              item={item}
+              level={0}
+              onFileSelect={handleFileSelect}
+              selectedFile={selectedFile}
+            />
+          ))}
+
+          {filteredTree.length === 0 && fileItems.length > 0 && (
+            <div className="p-4 text-center text-gray-500 text-sm">
+              No files match your search
+            </div>
+          )}
+
+          {fileItems.length === 0 && (
+            <div className="p-4 text-center text-gray-500 text-sm">
+              No files yet. Start building to see your project structure.
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="p-4">
+          {/* Search Bar */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-200" />
+            <input
+              type="text"
+              placeholder="Search files..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded-md text-white placeholder-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            {searchTerm.trim() ? (
+              filteredAndSortedItems.map((item) => (
+                <div
+                  key={item.path}
+                  className="py-1.5 px-2 cursor-pointer hover:bg-neutral-800 text-sm text-gray-300 rounded-md"
+                  onClick={() => handleFileSelect(item)}
+                >
+                  {item.name}
+                </div>
+              ))
+            ) : (
+              <div className="p-4 text-center text-gray-500 text-sm">
+                Looking for a file? 
+                <br/>
+                Start typing...
+              </div>
+            )}
+
+            {searchTerm.trim() && filteredAndSortedItems.length === 0 && (
+              <div className="p-4 text-center text-gray-500 text-sm">
+                No files match your search
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
 
-interface DirectoryNode {
-  directory: Record<string, FileNode | DirectoryNode>
-}
-
-type MountStructure = Record<string, FileNode | DirectoryNode>
-
-function FileTreeItem({ item, level, onFileSelect, selectedFile }: FileTreeItemProps) {
+function FileTreeItem({ item, level, onFileSelect, selectedFile }: any) {
   const [isExpanded, setIsExpanded] = useState(level < 2)
 
   const handleClick = () => {
@@ -67,7 +210,9 @@ function FileTreeItem({ item, level, onFileSelect, selectedFile }: FileTreeItemP
           </>
         )}
         <span
-          className={`text-gray-300 group-hover:text-white transition-colors ${isSelected ? "text-white font-medium" : ""}`}
+          className={`text-gray-300 group-hover:text-white transition-colors ${
+            isSelected ? "text-white font-medium" : ""
+          }`}
         >
           {item.name}
         </span>
@@ -86,180 +231,6 @@ function FileTreeItem({ item, level, onFileSelect, selectedFile }: FileTreeItemP
           ))}
         </div>
       )}
-    </div>
-  )
-}
-
-function buildNestedTree(items: FileItemFlat[]): any[] {
-  const root: Record<string, any> = {}
-
-  for (const item of items) {
-    const parts = item.path.split("/")
-    let current = root
-
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i]
-      const currentPath = parts.slice(0, i + 1).join("/")
-      const isFile = i === parts.length - 1 && item.type === "file"
-
-      if (!current[part]) {
-        current[part] = {
-          name: part,
-          path: currentPath,
-          type: isFile ? "file" : "folder",
-          children: isFile ? undefined : {},
-        }
-      }
-
-      if (!isFile) {
-        current = current[part].children
-      }
-    }
-  }
-
-  const convert = (node: any): any => {
-    return Object.values(node)
-      .map((item: any) => ({
-        ...item,
-        children: item.children ? convert(item.children) : undefined,
-      }))
-      .sort((a: any, b: any) => {
-        // Sort folders first, then files
-        if (a.type === "folder" && b.type === "file") return -1
-        if (a.type === "file" && b.type === "folder") return 1
-        
-        // Within same type, sort alphabetically
-        return a.name.localeCompare(b.name)
-      })
-  }
-
-  return convert(root)
-}
-
-function sortFileItems(items: FileItemFlat[]): FileItemFlat[] {
-  return items.slice().sort((a, b) => {
-    
-    // Prioritize by specific folder names (src first)
-    const aSrc = a.path.startsWith("src/") || a.path === "src"
-    const bSrc = b.path.startsWith("src/") || b.path === "src"
-    
-    if (aSrc && !bSrc) return -1
-    if (!aSrc && bSrc) return 1
-    
-    // Then sort by type (folders first)
-    if (a.type === "folder" && b.type === "file") return -1
-    if (a.type === "file" && b.type === "folder") return 1
-    
-    // Finally sort alphabetically
-    return a.name.localeCompare(b.name)
-  })
-}
-
-export function FileExplorer() {
-  const { fileItems, selectedFile, setSelectedFile, files, webcontainer } = useStore()
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const handleFileSelect = (file: any) => {
-    setSelectedFile(file.path)
-  }
-
-  const filteredAndSortedItems = useMemo(() => {
-    let filtered = fileItems
-    
-    if (searchTerm) {
-      filtered = fileItems.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.path.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-    
-    return sortFileItems(filtered)
-  }, [fileItems, searchTerm])
-
-  const filteredTree = useMemo(() => {
-    return buildNestedTree(filteredAndSortedItems)
-  }, [filteredAndSortedItems])
-
-  useEffect(() => {
-    const mountStructure: MountStructure = {}
-
-    fileItems.forEach(item => {
-      const pathParts = item.path.split('/')
-      let currentLevel: Record<string, FileNode | DirectoryNode> = mountStructure
-
-      for (let i = 0; i < pathParts.length - 1; i++) {
-        const part = pathParts[i]
-        if (!currentLevel[part]) {
-          currentLevel[part] = {
-            directory: {}
-          }
-        }
-        currentLevel = (currentLevel[part] as DirectoryNode).directory
-      }
-
-      const finalName = pathParts[pathParts.length - 1]
-      
-      if (item.type === 'file') {
-        const fileContent = files[item.path]?.content ?? item.content
-        
-        currentLevel[finalName] = {
-          file: {
-            contents: fileContent!
-          }
-        }
-      } else if (item.type === 'folder') {
-        currentLevel[finalName] = {
-          directory: {}
-        }
-      }
-    })
-
-    // console.log('Mount structure:', mountStructure)
-    webcontainer?.mount(mountStructure)
-  }, [fileItems, files, webcontainer]) 
-  return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col custom-scrollbar">
-      <div className="p-4 border-b border-neutral-700 space-y-3">
-        <h2 className="text-sm font-semibold text-gray-300">Explorer</h2>
-
-        {/* Search Box */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-200" />
-          <input
-            type="text"
-            placeholder="Search files..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded-md text-white placeholder-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto scrollbar-hidden">
-        {filteredTree.map((item) => (
-          <FileTreeItem
-            key={item.path}
-            item={item}
-            level={0}
-            onFileSelect={handleFileSelect}
-            selectedFile={selectedFile}
-          />
-        ))}
-        
-        {filteredTree.length === 0 && fileItems.length > 0 && (
-          <div className="p-4 text-center text-gray-500 text-sm">
-            No files match your search
-          </div>
-        )}
-        
-        {fileItems.length === 0 && (
-          <div className="p-4 text-center text-gray-500 text-sm">
-            No files yet. Start building to see your project structure.
-          </div>
-        )}
-      </div>
-
-      
     </div>
   )
 }
