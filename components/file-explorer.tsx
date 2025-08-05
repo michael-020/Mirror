@@ -41,8 +41,8 @@ function FileTreeItem({ item, level, onFileSelect, selectedFile }: FileTreeItemP
   return (
     <div>
       <div
-        className={`flex items-center gap-2 py-1.5 px-2 cursor-pointer hover:bg-gray-700 text-sm transition-colors group ${
-          isSelected ? "bg-blue-600 hover:bg-blue-600" : ""
+        className={`flex items-center gap-2 py-1.5 px-2 cursor-pointer hover:bg-neutral-800 text-sm transition-colors group ${
+          isSelected ? "bg-neutral-700 hover:bg-neutral-600" : ""
         }`}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
         onClick={handleClick}
@@ -219,18 +219,18 @@ export function FileExplorer() {
   }, [fileItems, files, webcontainer]) 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col custom-scrollbar">
-      <div className="p-4 border-b border-gray-700 space-y-3">
+      <div className="p-4 border-b border-neutral-700 space-y-3">
         <h2 className="text-sm font-semibold text-gray-300">Explorer</h2>
 
         {/* Search Box */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-200" />
           <input
             type="text"
             placeholder="Search files..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-9 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded-md text-white placeholder-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
       </div>

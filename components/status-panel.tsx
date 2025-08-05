@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useEditorStore } from "@/stores/editorStore/useEditorStore"
-import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucide-react'
+import { Clock, AlertCircle, ArrowRight, Loader2, Check } from 'lucide-react'
 import { BuildStepType, statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
-  const { buildSteps, isBuilding, processFollowupPrompts, isProcessing, isProcessingFollowups, promptStepsMap } = useEditorStore()
+  const { processFollowupPrompts, isProcessing, isProcessingFollowups, promptStepsMap } = useEditorStore()
   const [prompt, setPrompt] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
   
@@ -24,7 +24,7 @@ export function StatusPanel() {
   const getStatusIcon = (status: statusType) => {
     switch (status) {
       case statusType.Completed:
-        return <CheckCircle className="w-4 h-4 text-green-500" />
+        return <Check className="w-4 h-4 text-green-500" />
       case statusType.InProgress:
         return <Clock className="w-4 h-4 text-yellow-500 animate-spin" />
       case statusType.Error:
@@ -34,10 +34,6 @@ export function StatusPanel() {
     }
   }
 
-  const completedSteps = buildSteps.filter(step => step.status === statusType.Completed).length
-  const totalSteps = buildSteps.length
-  const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
-
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" })
@@ -46,35 +42,14 @@ export function StatusPanel() {
 
 
   return (
-    <div className="h-[94vh] flex flex-col">
-      <div className="p-4 border-b border-gray-700">
-        <div className="flex items-center gap-2 mb-2">
-          <Zap className="w-4 h-4 text-blue-400" />
-          <h2 className="text-sm font-semibold text-gray-300">Build Status</h2>
-        </div>
-        
-        {isBuilding && totalSteps > 0 && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Progress</span>
-              <span>{Math.round(progressPercentage)}%</span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-1.5">
-              <div 
-                className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-          </div>
-        )}
-      </div>
+    <div className="h-[94vh] flex flex-col overflow-x-hidden">
 
-      <div className="flex-1 overflow-auto p-4 space-y-4 custom-scrollbar">
+      <div className="flex-1 overflow-x-hidden flex-wrap p-4 space-y-4 custom-scrollbar">
         {Array.from(promptStepsMap.entries()).map(([promptIndex, { prompt, steps }]) => (
           <div key={promptIndex} className="space-y-3">
             {/* Render Input Prompt (aligned to the right) */}
             <div className="flex items-start gap-3 justify-end mb-3">
-              <div className="flex-1 bg-blue-600 rounded-lg rounded-tr-none p-3 max-w-[80%] ml-auto">
+              <div className="flex-1 bg-neutral-700 rounded-lg rounded-tr-none p-3 max-w-[80%] ml-auto">
                 <p className="text-sm text-white break-words">
                   {prompt}
                 </p>
@@ -83,12 +58,12 @@ export function StatusPanel() {
             
             {/* Render Build Steps for this prompt */}
             {steps.length > 0 && (
-              <div className="space-y-2 ml-2">
+              <div className="space-y-2 ml-2 ">
                 {steps.filter(step => step.shouldExecute !== false).map((step) => (
                   <div key={step.id} className="flex items-start gap-3 py-0.5 group">
                     {getStatusIcon(step.status)}
                     <div className="flex-1 min-w-0 flex flex-col">
-                      <p className="text-sm text-gray-300 group-hover:text-white transition-colors">
+                      <p className="text-[0.8rem] text-gray-300 text-wrap group-hover:text-white transition-colors">
                         {step.type === BuildStepType.RunScript ? step.description : step.title}
                       </p>
                     </div>
@@ -108,30 +83,29 @@ export function StatusPanel() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-gray-700 p-4 bg-gray-800">
+      <div className="border-t border-neutral-800 p-2 bg-neutral-950">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input
             type="text"
             value={prompt}
             readOnly={isProcessing || isProcessingFollowups}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Enter your next instruction..."
-            className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Ask a follow up..."
+            className="flex-1 px-2 py-2  w-8 placeholder:text-sm bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-0.5 focus:ring-neutral-500 focus:border-neutral-500"
           />
           <button
             type="submit"
             disabled={!prompt.trim() || isProcessingFollowups}
             className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
               prompt.trim() && !isProcessing
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                ? "bg-neutral-300 hover:bg-neutral-400 text-black"
+                : "bg-neutral-600 text-gray-400 cursor-not-allowed"
             }`}
           >
             {isProcessingFollowups ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <>
-                <span>Send</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}

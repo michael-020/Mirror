@@ -8,28 +8,26 @@ interface CodeEditorTabsProps {
 
 export function CodeEditorTabs({ activeTab, onTabChange }: CodeEditorTabsProps) {
   return (
-    <div className="bg-gray-800 border-b border-gray-700 flex">
+    <div className="bg-neutral-800 border-b border-neutral-700 flex p-2">
       <button
         onClick={() => onTabChange("code")}
-        className={`px-4 py-2 text-sm border-r border-gray-600 transition-colors flex items-center gap-1 ${
+        className={`px-4 py-2 text-sm border-r rounded-l-lg border-neutral-700 transition-colors flex items-center gap-1 ${
           activeTab === "code"
-            ? "bg-gray-700 text-white border-b-2 border-blue-500"
-            : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-750"
+            ? "bg-neutral-950 text-neutral-200"
+            : "bg-neutral-900 text-neutral-300 hover:text-white"
         }`}
       >
-        <Code className="w-4 h-4" />
-        Code
+        <Code className="size-3" />
       </button>
       <button
         onClick={() => onTabChange("preview")}
-        className={`px-4 py-2 text-sm transition-colors flex items-center gap-1 ${
+        className={`px-4 py-2 text-sm transition-colors rounded-r-lg flex items-center gap-1 ${
           activeTab === "preview"
-            ? "bg-gray-700 text-white border-b-2 border-blue-500"
-            : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-750"
+            ? "bg-neutral-950 text-neutral-200"
+            : "bg-neutral-900 text-neutral-400 hover:text-white"
         }`}
       >
-        <Eye className="w-4 h-4" />
-        Preview
+        <Eye className="size-3" />
       </button>
     </div>
   )

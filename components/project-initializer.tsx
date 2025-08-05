@@ -32,10 +32,10 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
         {/* Main Form */}
-        <div className="bg-gray-800/80 backdrop-blur-sm border border-gray-700 rounded-xl p-6 mb-6">
+        <div className="bg-neutral-900/80 backdrop-blur-sm border shadow-lg shadow-neutral-700 border-neutral-700 rounded-xl p-6 mb-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
@@ -46,7 +46,7 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe your website idea in detail... For example: 'Create a modern portfolio website for a web developer with a hero section, about me, projects showcase, and contact form'"
-                className="w-full h-32 px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                className="w-full h-32 px-4 py-3 bg-neutral-800 border border-neutral-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 resize-none"
                 required
               />
             </div>
@@ -56,7 +56,7 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
               disabled={!description.trim() || isLoading}
               className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                 description.trim() && !isLoading
-                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  ? "bg-cyan-500 hover:bg-cyan-600 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   : "bg-gray-600 text-gray-400 cursor-not-allowed"
               }`}
             >
