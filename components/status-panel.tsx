@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useEditorStore } from "@/stores/editorStore/useEditorStore"
 import { CheckCircle, Clock, AlertCircle, Zap, ArrowRight, Loader2 } from 'lucide-react'
 import { BuildStepType, statusType } from "@/stores/editorStore/types"
@@ -8,6 +8,7 @@ import { BuildStepType, statusType } from "@/stores/editorStore/types"
 export function StatusPanel() {
   const { buildSteps, isBuilding, processFollowupPrompts, isProcessing, isProcessingFollowups, promptStepsMap } = useEditorStore()
   const [prompt, setPrompt] = useState("")
+  const bottomRef = useRef<HTMLDivElement>(null)
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,6 +37,13 @@ export function StatusPanel() {
   const completedSteps = buildSteps.filter(step => step.status === statusType.Completed).length
   const totalSteps = buildSteps.length
   const progressPercentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" })
+    }
+  }, [promptStepsMap])
+
 
   return (
     <div className="h-[94vh] flex flex-col">
@@ -97,6 +105,7 @@ export function StatusPanel() {
             <span>Processing changes...</span>
           </div>
         )}
+        <div ref={bottomRef} />
       </div>
 
       <div className="border-t border-gray-700 p-4 bg-gray-800">
