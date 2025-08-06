@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useEditorStore } from "@/stores/editorStore/useEditorStore"
-import { Clock, AlertCircle, ArrowRight, Loader2, Check } from 'lucide-react'
+import { Clock, AlertCircle, ArrowRight, Loader2, Check, Copy } from 'lucide-react'
 import { BuildStepType, statusType } from "@/stores/editorStore/types"
 
 export function StatusPanel() {
   const { processFollowupPrompts, isProcessing, isProcessingFollowups, promptStepsMap } = useEditorStore()
   const [prompt, setPrompt] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
+  const [copiedPromptIndex, setCopiedPromptIndex] = useState<number | null>(null)
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,6 +21,20 @@ export function StatusPanel() {
     
     setPrompt("") 
   }
+
+  const handleCopy = async (text: string, promptIndex: number) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedPromptIndex(promptIndex)
+
+      setTimeout(() => {
+        setCopiedPromptIndex(null)
+      }, 3000)
+    } catch (err) {
+      console.error("Failed to copy text: ", err)
+    }
+  }
+
 
   const getStatusIcon = (status: statusType) => {
     switch (status) {
@@ -47,14 +62,27 @@ export function StatusPanel() {
       <div className="flex-1 overflow-x-hidden flex-wrap p-4 space-y-4 custom-scrollbar">
         {Array.from(promptStepsMap.entries()).map(([promptIndex, { prompt, steps }]) => (
           <div key={promptIndex} className="space-y-3">
-            {/* Render Input Prompt (aligned to the right) */}
-            <div className="flex items-start gap-3 justify-end mb-3">
-              <div className="flex-1 bg-neutral-700 rounded-lg rounded-tr-none p-3 max-w-[80%] ml-auto">
+            <div className="flex flex-col items-end gap-1 justify-end mb-3">
+              <div className="bg-neutral-700 rounded-lg rounded-tr-none p-3 max-w-[80%] ml-auto">
                 <p className="text-sm text-white break-words">
                   {prompt}
                 </p>
               </div>
+              <button
+                onClick={() => handleCopy(prompt, promptIndex)}
+                className="p-1 hover:text-white text-gray-400 transition-colors"
+                title={copiedPromptIndex === promptIndex ? "Copied" : "Copy prompt"}
+                aria-label="Copy prompt"
+              >
+                {copiedPromptIndex === promptIndex ? (
+                  <Check className="size-4 text-neutral-500" />
+                ) : (
+                  <Copy className="size-4" />
+                )}
+              </button>
             </div>
+
+
             
             {/* Render Build Steps for this prompt */}
             {steps.length > 0 && (
