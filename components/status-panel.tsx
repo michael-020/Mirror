@@ -39,7 +39,7 @@ export function StatusPanel() {
   const getStatusIcon = (status: statusType) => {
     switch (status) {
       case statusType.Completed:
-        return <Check className="w-4 h-4 text-green-500" />
+        return <Check className="w-4 h-4 text-green-500 translate-y-1" />
       case statusType.InProgress:
         return <Clock className="w-4 h-4 text-yellow-500 animate-spin" />
       case statusType.Error:
@@ -86,14 +86,33 @@ export function StatusPanel() {
             
             {/* Render Build Steps for this prompt */}
             {steps.length > 0 && (
-              <div className="space-y-2 ml-2 ">
+              <div className="space-y-2 ml-2 bg-neutral-900 px-3 p-2 rounded-lg">
                 {steps.filter(step => step.shouldExecute !== false).map((step) => (
                   <div key={step.id} className="flex items-start gap-3 py-0.5 group">
                     {getStatusIcon(step.status)}
                     <div className="flex-1 min-w-0 flex flex-col">
-                      <p className="text-[0.8rem] text-gray-300 text-wrap group-hover:text-white transition-colors">
-                        {step.type === BuildStepType.RunScript ? step.description : step.title}
-                      </p>
+                      {step.type === BuildStepType.RunScript ? 
+                        <div className="space-y-2">
+                          <p className="text-[0.8rem] text-blue-500">Start application</p>
+                          <p className="text-[0.8rem] text-orange-300 py-2 pl-2 rounded-md text-wrap bg-neutral-800 transition-colors">
+                            {step.description}
+                          </p> 
+                        </div> :
+                        <p className="text-[0.8rem] text-gray-300 text-wrap group-hover:text-white transition-colors">
+                          {step.title.startsWith("Create") ? (
+                            <div className="space-x-1 flex flex-wrap items-center">
+                              <span className="font-semibold text-white">Create</span>
+                              <span className="bg-neutral-800 p-2 py-1 rounded-md">
+                                {step.title
+                                  .replace(/^Create\s*/, "")                  
+                                  .replace(/^React Component\s*/, "")}        
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="text-white">{step.title}</div>
+                          )}
+                        </p>
+                      }
                     </div>
                   </div>
                 ))}

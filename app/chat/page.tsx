@@ -7,7 +7,7 @@ import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
 import { Plus, ArrowLeft } from "lucide-react"
 import { ProjectInitializer } from "@/components/project-initializer"
 import { EditorWorkspace } from "@/components/editor-workspace"
-import { LoadingModal } from "@/components/init-loading-modal"
+import { InitLoadingModal } from "@/components/init-loading-modal"
 
 export default function ChatPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -45,8 +45,9 @@ export default function ChatPage() {
   }
 
   return (
-      <div className="h-screen flex flex-col bg-gray-900 text-white">
-        {/* Header */}
+      <div 
+        className="h-screen flex flex-col bg-gray-900 text-white"
+      >
         <div className=" bg-neutral-950 border-b border-neutral-700 flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <button
@@ -87,7 +88,7 @@ export default function ChatPage() {
         {/* Create File Modal */}
         <CreateFileModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         
-        {isInitialising && <LoadingModal />}
+        {isInitialising && <InitLoadingModal />}
       </div>
 
   )

@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { useEffect, useRef, useState } from "react"
+import { ArrowUp, LoaderPinwheel } from 'lucide-react'
 import { useEditorStore } from "@/stores/editorStore/useEditorStore"
+import { useSession } from "next-auth/react"
+import { redirect } from "next/navigation"
 
 interface ProjectInitializerProps {
   onSubmit: (description: string) => void
@@ -11,7 +13,21 @@ interface ProjectInitializerProps {
 export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
   const [description, setDescription] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const textareaRef = useRef(null)
   const { processPrompt } = useEditorStore()
+  const session = useSession()
+
+  useEffect(() => {
+      if(!session)
+        redirect("/")
+  }, [session])
+
+  useEffect(() => { 
+    if (textareaRef.current) {
+      (textareaRef.current as HTMLTextAreaElement).focus()
+    }
+  }, [])
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,47 +48,67 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full">
-        {/* Main Form */}
-        <div className="bg-neutral-900/80 backdrop-blur-sm border shadow-lg shadow-neutral-700 border-neutral-700 rounded-xl p-6 mb-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
-                What kind of website do you want to build?
-              </label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your website idea in detail... For example: 'Create a modern portfolio website for a web developer with a hero section, about me, projects showcase, and contact form'"
-                className="w-full h-32 px-4 py-3 bg-neutral-800 border border-neutral-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 resize-none"
-                required
-              />
+    <div className="relative min-h-screen bg-black">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-neutral-800">
+        <div className="flex items-center justify-between px-6 py-3">
+          <div className="text-white font-bold text-xl tracking-wide">
+            Mirror
+          </div>
+          <div className="flex items-center justify-center size-10 text-white cursor-pointer bg-gradient-to-br from-neutral-600 to-neutral-700 rounded-full hover:from-neutral-500 hover:to-neutral-600 transition-all duration-200 shadow-lg">
+            <span className="text-sm font-medium">
+              {session.data?.user?.email?.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        </div>
+      </nav>
+
+      <div className="flex items-center justify-center min-h-screen px-6 pb-20">
+        <div className="w-full max-w-3xl mx-auto">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="text-center space-y-2">
+              <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">
+                Start with a sentence.
+              </h1>
+              <h2 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                End with a website.
+              </h2>
             </div>
 
-            <button
-              type="submit"
-              disabled={!description.trim() || isLoading}
-              className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                description.trim() && !isLoading
-                  ? "bg-cyan-500 hover:bg-cyan-600 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                  : "bg-gray-600 text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Initializing Project...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  Start Building
-                  <ArrowRight className="w-5 h-5" />
-                </>
-              )}
-            </button>
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative">
+                <textarea
+                  ref={textareaRef}
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe the website you want to build..."
+                  className="w-full h-40 px-6 py-4 bg-neutral-900/90 backdrop-blur-sm border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500/50 focus:border-neutral-500/50 resize-none transition-all duration-200 custom-scrollbar text-lg leading-relaxed"
+                  required
+                />
+
+                <button
+                  type="submit"
+                  disabled={!description.trim() || isLoading}
+                  className={`absolute bottom-4 right-4 p-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                    description.trim() && !isLoading
+                      ? "bg-neutral-200 hover:bg-neutral-300 text-black shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transform hover:-translate-y-0.5 hover:scale-105"
+                      : "bg-neutral-800 text-neutral-500 cursor-not-allowed"
+                  }`}
+                >
+                  {!isLoading ? (
+                    <>
+                      <ArrowUp className="w-5 h-5" />
+                    </>
+                  ) : (
+                    <>
+                      <LoaderPinwheel className="animate-spin size-5" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </form>
         </div>
       </div>
