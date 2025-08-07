@@ -93,12 +93,12 @@ export function StatusPanel() {
                     <div className="flex-1 min-w-0 flex flex-col">
                       {step.type === BuildStepType.RunScript ? 
                         <div className="space-y-2">
-                          <p className="text-[0.8rem] text-blue-500">Start application</p>
+                            <p className="text-[0.8rem] text-blue-500">Execute Command</p>
                           <p className="text-[0.8rem] text-orange-300 py-2 pl-2 rounded-md text-wrap bg-neutral-800 transition-colors">
                             {step.description}
                           </p> 
                         </div> :
-                        <p className="text-[0.8rem] text-gray-300 text-wrap group-hover:text-white transition-colors">
+                        <div className="text-[0.8rem] text-gray-300 text-wrap group-hover:text-white transition-colors">
                           {step.title.startsWith("Create") ? (
                             <div className="space-x-1 flex flex-wrap items-center">
                               <span className="font-semibold text-white">Create</span>
@@ -111,7 +111,7 @@ export function StatusPanel() {
                           ) : (
                             <div className="text-white">{step.title}</div>
                           )}
-                        </p>
+                        </div>
                       }
                     </div>
                   </div>

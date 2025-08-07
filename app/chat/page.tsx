@@ -48,7 +48,7 @@ export default function ChatPage() {
       <div 
         className="h-screen flex flex-col bg-gray-900 text-white"
       >
-        <div className=" bg-neutral-950 border-b border-neutral-700 flex items-center justify-between px-4">
+        <div className="py-3 bg-neutral-950 border-b border-neutral-700 flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <button
               onClick={handleBackToInitializer}

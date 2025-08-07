@@ -5,6 +5,7 @@ import { ArrowUp, LoaderPinwheel } from 'lucide-react'
 import { useEditorStore } from "@/stores/editorStore/useEditorStore"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
+import { TextArea } from "./text-area"
 
 interface ProjectInitializerProps {
   onSubmit: (description: string) => void
@@ -29,8 +30,7 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
   }, [])
 
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = () => {
     if (!description.trim()) return
 
     setIsLoading(true)
@@ -46,6 +46,11 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
       setIsLoading(false)
     }
   }
+
+   const handleFormSubmit = (e: React.FormEvent) => {
+      e.preventDefault()
+      handleSubmit()
+    }
 
   return (
     <div className="relative min-h-screen bg-black">
@@ -65,7 +70,8 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
 
       <div className="flex items-center justify-center min-h-screen px-6 pb-20">
         <div className="w-full max-w-3xl mx-auto">
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleFormSubmit} className="space-y-8">
+            {/* Hero Text */}
             <div className="text-center space-y-2">
               <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">
                 Start with a sentence.
@@ -75,25 +81,29 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
               </h2>
             </div>
 
+            {/* Input Section */}
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative">
-                <textarea
-                  ref={textareaRef}
+                <TextArea
                   id="description"
+                  ref={textareaRef}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  onEnterSubmit={handleSubmit}
                   placeholder="Describe the website you want to build..."
-                  className="w-full h-40 px-6 py-4 bg-neutral-900/90 backdrop-blur-sm border border-neutral-700 rounded-xl text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500/50 focus:border-neutral-500/50 resize-none transition-all duration-200 custom-scrollbar text-lg leading-relaxed"
+                  height="8rem"
+                  maxHeight="16rem"
                   required
                 />
 
+                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={!description.trim() || isLoading}
                   className={`absolute bottom-4 right-4 p-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                     description.trim() && !isLoading
-                      ? "bg-neutral-200 hover:bg-neutral-300 text-black shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transform hover:-translate-y-0.5 hover:scale-105"
+                      ? "bg-neutral-300 hover:bg-neutral-400 text-black shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transform hover:-translate-y-0.5 hover:scale-105"
                       : "bg-neutral-800 text-neutral-500 cursor-not-allowed"
                   }`}
                 >
@@ -103,7 +113,7 @@ export function ProjectInitializer({ onSubmit }: ProjectInitializerProps) {
                     </>
                   ) : (
                     <>
-                      <LoaderPinwheel className="animate-spin size-5" />
+                      <LoaderPinwheel className="animate-spin w-5 h-5" />
                     </>
                   )}
                 </button>
