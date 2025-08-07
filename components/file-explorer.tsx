@@ -1,13 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useEditorStore as useStore } from "@/stores/editorStore/useEditorStore"
 import { ChevronRight, ChevronDown, FileIcon, Folder, FolderOpen, Search } from "lucide-react"
 import type { FileItemFlat } from "@/stores/editorStore/types"
 
+interface FileTreeItemProps {
+  item: any
+  level: number
+  onFileSelect: (file: any) => void
+  selectedFile: string | null
+}
+
+interface FileNode {
+  file: {
+    contents: string
+  }
+}
+
+interface DirectoryNode {
+  directory: Record<string, FileNode | DirectoryNode>
+}
+
+type MountStructure = Record<string, FileNode | DirectoryNode>
+
 export function FileExplorer() {
-  const { fileItems, selectedFile, setSelectedFile } = useStore()
+  const { fileItems, selectedFile, setSelectedFile, files, webcontainer } = useStore()
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState<"files" | "search">("files")
 
@@ -72,6 +91,44 @@ export function FileExplorer() {
 
     return buildNestedTree(filteredAndSortedItems)
   }, [filteredAndSortedItems])
+
+  useEffect(() => {
+    const mountStructure: MountStructure = {}
+
+    fileItems.forEach(item => {
+      const pathParts = item.path.split('/')
+      let currentLevel: Record<string, FileNode | DirectoryNode> = mountStructure
+
+      for (let i = 0; i < pathParts.length - 1; i++) {
+        const part = pathParts[i]
+        if (!currentLevel[part]) {
+          currentLevel[part] = {
+            directory: {}
+          }
+        }
+        currentLevel = (currentLevel[part] as DirectoryNode).directory
+      }
+
+      const finalName = pathParts[pathParts.length - 1]
+      
+      if (item.type === 'file') {
+        const fileContent = files[item.path]?.content ?? item.content
+        
+        currentLevel[finalName] = {
+          file: {
+            contents: fileContent!
+          }
+        }
+      } else if (item.type === 'folder') {
+        currentLevel[finalName] = {
+          directory: {}
+        }
+      }
+    })
+
+    webcontainer?.mount(mountStructure)
+  }, [fileItems, files, webcontainer])
+
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col custom-scrollbar">
@@ -168,7 +225,7 @@ export function FileExplorer() {
   )
 }
 
-function FileTreeItem({ item, level, onFileSelect, selectedFile }: any) {
+function FileTreeItem({ item, level, onFileSelect, selectedFile }: FileTreeItemProps) {
   const [isExpanded, setIsExpanded] = useState(level < 2)
 
   const handleClick = () => {
