@@ -30,7 +30,7 @@ export function EditorWorkspace() {
         {activeTab === "code" ? (
           <div className="h-full flex">
             {/* File Explorer */}
-            <div className="w-64 border-r border-neutral-700">
+            <div className="w-64 border-r border-neutral-800">
               <FileExplorer />
             </div>
             

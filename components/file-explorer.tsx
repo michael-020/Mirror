@@ -131,9 +131,9 @@ export function FileExplorer() {
 
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col custom-scrollbar">
+    <div className="h-[calc(100vh-4rem)] flex flex-col scrollbar-hidden">
       {/* Tabs */}
-      <div className="flex border-b border-neutral-700">
+      <div className="flex border-b border-neutral-800">
         <button
           onClick={() => setActiveTab("files")}
           className={`px-4 py-2 text-sm ${
@@ -158,7 +158,7 @@ export function FileExplorer() {
 
       {/* Tab Content */}
       {activeTab === "files" ? (
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto scrollbar-hidden pb-20">
           {filteredTree.map((item) => (
             <FileTreeItem
               key={item.path}
@@ -194,7 +194,7 @@ export function FileExplorer() {
               className="w-full pl-9 pr-3 py-2 bg-neutral-700 border border-neutral-600 rounded-md text-white placeholder-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto scrollbar-hidden">
             {searchTerm.trim() ? (
               filteredAndSortedItems.map((item) => (
                 <div

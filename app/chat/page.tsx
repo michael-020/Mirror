@@ -48,7 +48,7 @@ export default function ChatPage() {
       <div 
         className="h-screen flex flex-col bg-gray-900 text-white"
       >
-        <div className="py-3 bg-neutral-950 border-b border-neutral-700 flex items-center justify-between px-4">
+        <div className="py-2 pt-5 bg-neutral-950 border-b border-neutral-800 flex items-center justify-between px-4">
           <div>
             <button onClick={handleBackToInitializer}>
               <h1 className="text-lg font-semibold font-stretch-ultra-expanded">Mirror</h1>
@@ -57,7 +57,7 @@ export default function ChatPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-3 py-1.5 text-sm bg-neutral-800 border border-neutral-700 hover:bg-gray-600 rounded-md transition-colors flex items-center gap-1"
+              className="px-3 py-1.5 text-sm bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 rounded-md transition-colors flex items-center gap-1"
             >
               <Plus className="w-4 h-4" />
               New File
@@ -68,7 +68,7 @@ export default function ChatPage() {
         {/* Main Content - 3 Column Grid */}
         <div className="flex-1 grid grid-cols-12 gap-0">
           {/* Left Column - Status Panel */}
-          <div className="col-span-3 bg-neutral-950 border-r border-neutral-700">
+          <div className="col-span-3 bg-neutral-950 border-r border-neutral-800">
             <StatusPanel />
           </div>
 
