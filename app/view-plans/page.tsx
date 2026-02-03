@@ -56,7 +56,7 @@ const ViewPlansPage = () => {
       const { token } = await res.json();
 
       window.location.href =
-        `http://localhost:3001/payment-page?token=${token}`;
+        `${process.env.NEXT_PUBLIC_PAYMENT_API_URL}/?token=${token}`;
     }
   }
 
