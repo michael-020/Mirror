@@ -91,7 +91,7 @@ export function CodeEditorTabs({
             // disabled={isInstalling}
             aria-label="Preview"
             onClick={() => {
-              if(isProjectBuilding){
+              if(isProjectBuilding || isProcessingFollowups){
                 showLoaderToast("Please wait, \nyour project is being built...")
                 return
               }
