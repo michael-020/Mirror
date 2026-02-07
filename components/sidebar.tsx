@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import clsx from 'clsx'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { useAuthStore } from '@/stores/authStore/useAuthStore'
 
 export interface Chat {
   id: string
@@ -28,11 +30,21 @@ export default function RightSidebar({
 }: RightSidebarProps) {
   const [chats, setChats] = useState<Chat[]>([])
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
+
   const sidebarRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+
+  const { data: session, status } = useSession()
+  const { isPremium, setPremiumStatus } = useAuthStore()
 
   useEffect(() => {
-    if (!isOpen) {
+    if (status === 'authenticated') {
+      setPremiumStatus(!!session?.user?.isPremium)
+    }
+  }, [status, session, setPremiumStatus])
+
+  useEffect(() => {
+    if (!isOpen || status !== 'authenticated') {
       setLoading(true)
       return
     }
@@ -51,7 +63,7 @@ export default function RightSidebar({
     }
 
     fetchChats()
-  }, [isOpen])
+  }, [isOpen, status])
 
   useEffect(() => {
     if (!isOpen) return
@@ -85,7 +97,7 @@ export default function RightSidebar({
         <h2 className="text-lg font-semibold">Recent Chats</h2>
         <button
           onClick={() => setIsOpenAction(false)}
-          className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white -translate-x-1"
+          className="text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white -translate-x-1"
         >
           <X />
         </button>
@@ -93,16 +105,17 @@ export default function RightSidebar({
 
       <div className="p-4 space-y-4 overflow-y-auto custom-scrollbar overflow-x-hidden h-[calc(100%-56px-48px)]">
         <button
-          className="w-full truncate flex items-center gap-2 bg-neutral-100 dark:bg-neutral-900 rounded px-3 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 cursor-pointer text-left"
-          title="New Chat"
+          className="w-full truncate flex items-center gap-2 bg-neutral-100 dark:bg-neutral-900 rounded px-3 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-left"
           onClick={() => {
-            router.push(`/chat`)
+            router.push('/chat')
             setIsOpenAction(false)
           }}
         >
-          <Plus className="size-4" /> <span>New Chat</span>
+          <Plus className="size-4" />
+          <span>New Chat</span>
         </button>
-        {loading ? (
+
+        {status === 'loading' || loading ? (
           Array.from({ length: 6 }).map((_, index) => (
             <div
               key={index}
@@ -111,13 +124,15 @@ export default function RightSidebar({
           ))
         ) : chats.length === 0 ? (
           <p className="text-neutral-400 dark:text-neutral-500 text-center">
-            You haven&apos;t started any chats. <br/> Start one now!
+            You haven&apos;t started any chats.
+            <br />
+            Start one now!
           </p>
         ) : (
           chats.map((chat) => (
             <button
               key={chat.id}
-              className="w-full truncate bg-neutral-100 dark:bg-neutral-900 rounded px-3 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 cursor-pointer text-left"
+              className="w-full truncate bg-neutral-100 dark:bg-neutral-900 rounded px-3 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 text-left"
               title={chat.name}
               onClick={() => {
                 router.push(`/prev-chat/${chat.id}`)
@@ -130,15 +145,19 @@ export default function RightSidebar({
         )}
       </div>
 
-      <div className="absolute bottom-4 w-full px-4">
-        <button
-          onClick={() => router.push('/view-plans')}
-          className="w-full bg-gradient-to-r from-purple-500/70 to-purple-600/70 dark:from-purple-400/70 dark:to-purple-500/70 text-white py-2 rounded-lg text-sm hover:from-purple-600/50 hover:to-purple-700/50 dark:hover:from-purple-500/60 dark:hover:to-purple-400/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Upgrade to Pro
-        </button>
-      </div>
+      {!isPremium && (
+        <div className="absolute bottom-4 w-full px-4">
+          <button
+            onClick={() => {
+              router.push('/view-plans')
+              setIsOpenAction(false)
+            }}
+            className="w-full bg-gradient-to-r from-purple-500/70 to-purple-600/70 dark:from-purple-400/70 dark:to-purple-500/70 text-white py-2 rounded-lg text-sm hover:from-purple-600/50 hover:to-purple-700/50 dark:hover:from-purple-500/60 dark:hover:to-purple-400/60 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Upgrade to Pro
+          </button>
+        </div>
+      )}
     </aside>
   )
 }
-
