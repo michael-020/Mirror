@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
-const ALLOWED_ORIGIN = "http://localhost:3001";
+const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_PAYMENT_API_URL!;
 
 function cors(origin: string | null): Record<string, string> {
   if (origin === ALLOWED_ORIGIN) {
