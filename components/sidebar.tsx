@@ -33,7 +33,6 @@ export default function RightSidebar({
 
   useEffect(() => {
     if (!isOpen) {
-      // Reset loading state when closed so it refetches next time
       setLoading(true)
       return
     }
