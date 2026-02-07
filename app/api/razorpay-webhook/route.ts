@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
   const signature = req.headers.get("x-razorpay-signature")
 
   if (!signature) {
+    console.log("Invalid signature")
     return NextResponse.json({ msg: "Missing signature" }, { status: 400 })
   }
 
@@ -18,12 +19,14 @@ export async function POST(req: NextRequest) {
     .digest("hex")
 
   if (expectedSignature !== signature) {
+    console.log("Invalid webhook signature")
     return NextResponse.json({ msg: "Invalid webhook signature" }, { status: 400 })
   }
 
   const event = JSON.parse(body)
 
   if (event.event !== "payment.captured") {
+    console.log("Payment captured")
     return NextResponse.json({ received: true })
   }
 
@@ -36,10 +39,12 @@ export async function POST(req: NextRequest) {
   })
 
   if (!payment) {
+    console.log("Payment record not found")
     return NextResponse.json({ msg: "Payment record not found" }, { status: 404 })
   }
 
   if (payment.status === "SUCCESS") {
+    console.log("payment successful")
     return NextResponse.json({ received: true })
   }
 
@@ -56,6 +61,8 @@ export async function POST(req: NextRequest) {
       data: { isPremium: true },
     }),
   ])
+
+  console.log("payment verified successfully")
 
   return NextResponse.json({ received: true })
 }
