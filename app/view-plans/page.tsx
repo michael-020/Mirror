@@ -65,10 +65,10 @@ const ViewPlansPage = () => {
         <div className="w-full max-w-6xl">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-4">
-              Choose Your Plan
+              {isPremium ? "You're on the Pro plan" : "Choose Your Plan"}
             </h1>
             <p className="text-neutral-600 dark:text-neutral-400 text-lg">
-              Build stunning websites with AI-powered generation
+              Design, generate, and ship websites faster with Zap.
             </p>
           </div>
 
