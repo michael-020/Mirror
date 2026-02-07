@@ -88,6 +88,7 @@ const ViewPlansPage = () => {
                   <Feature text="Basic AI model" />
                   <Feature text="5 projects" />
                   <Feature text="Advanced AI model" disabled />
+                  <Feature text="5 downloads only" disabled />
                 </div>
 
                 {!isPremium && <button
