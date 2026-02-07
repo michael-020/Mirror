@@ -4,8 +4,6 @@ import Navbar from "@/components/navbar"
 import RightSidebar from "@/components/sidebar"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import styles from './policies.module.css';
 
 const PoliciesPage = () => {
   const router = useRouter()
@@ -13,7 +11,7 @@ const PoliciesPage = () => {
   const [isHovered, setIsHovered] = useState(false)
 
   const onBackHandler = () => {
-    router.push("/")
+    router.push("/chat")
   }
 
   useEffect(() => {
@@ -54,24 +52,24 @@ const PoliciesPage = () => {
         showPanelToggle={true}
         onPanelToggle={() => setIsOpen(!isOpen)} 
       />
-      <div className="min-h-screen bg-neutral-50 dark:bg-black pt-24 pb-16 px-4">
+      <div className="min-h-screen bg-neutral-50 dark:bg-black pt-20 sm:pt-24 pb-12 sm:pb-16 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-4">
+          <div className="mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-3 sm:mb-4">
               Policies & Terms
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 text-lg">
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base md:text-lg">
               Last updated: January 22, 2026
             </p>
           </div>
 
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             {/* Terms of Service */}
-            <section className="bg-white dark:bg-neutral-900/60 rounded-2xl p-8 border border-neutral-200 dark:border-neutral-800/50">
-              <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">
+            <section className="bg-white dark:bg-neutral-900/60 rounded-xl sm:rounded-2xl p-5 sm:p-8 border border-neutral-200 dark:border-neutral-800/50">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-4 sm:mb-6">
                 Terms of Service
               </h2>
-              <div className="space-y-4 text-neutral-700 dark:text-neutral-300">
+              <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-neutral-700 dark:text-neutral-300">
                 <p>
                   By accessing and using Zap, you agree to be bound by these Terms of Service. 
                   If you do not agree to these terms, please do not use our service.
@@ -120,11 +118,11 @@ const PoliciesPage = () => {
             </section>
 
             {/* Payment & Subscription */}
-            <section className="bg-white dark:bg-neutral-900/60 rounded-2xl p-8 border border-neutral-200 dark:border-neutral-800/50">
-              <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">
+            <section className="bg-white dark:bg-neutral-900/60 rounded-xl sm:rounded-2xl p-5 sm:p-8 border border-neutral-200 dark:border-neutral-800/50">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-4 sm:mb-6">
                 Payment & Subscription Policy
               </h2>
-              <div className="space-y-4 text-neutral-700 dark:text-neutral-300">
+              <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-neutral-700 dark:text-neutral-300">
                 <div>
                   <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">
                     1. Pricing Plans
@@ -132,7 +130,7 @@ const PoliciesPage = () => {
                   <p className="mb-3">
                     Zap offers two pricing tiers:
                   </p>
-                  <ul className="list-disc list-inside space-y-2 ml-4">
+                  <ul className="list-disc list-inside space-y-2 ml-2 sm:ml-4">
                     <li>
                       <span className="font-semibold text-neutral-900 dark:text-white">Free Plan:</span> Limited 
                       to 5 iterations per day, 5 projects per account, 5 downloads per account, and access 
@@ -168,25 +166,25 @@ const PoliciesPage = () => {
             </section>
 
             {/* Refund Policy */}
-            <section className="bg-white dark:bg-neutral-900/60 rounded-2xl p-8 border-2 border-purple-500/30 dark:border-purple-500/20">
-              <div className="flex items-start gap-3 mb-6">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <section className="bg-white dark:bg-neutral-900/60 rounded-xl sm:rounded-2xl p-5 sm:p-8 border-2 border-purple-500/30 dark:border-purple-500/20">
+              <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <div className="p-1.5 sm:p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex-shrink-0">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
                     Refund Policy
                   </h2>
-                  <p className="text-purple-600 dark:text-purple-400 font-semibold mt-1">
+                  <p className="text-purple-600 dark:text-purple-400 font-semibold mt-1 text-xs sm:text-sm">
                     Important: Please read carefully
                   </p>
                 </div>
               </div>
-              <div className="space-y-4 text-neutral-700 dark:text-neutral-300">
-                <div className="bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800/30 rounded-lg p-6">
-                  <h3 className="font-bold text-neutral-900 dark:text-white mb-3 text-lg">
+              <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-neutral-700 dark:text-neutral-300">
+                <div className="bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800/30 rounded-lg p-4 sm:p-6">
+                  <h3 className="font-bold text-neutral-900 dark:text-white mb-2 sm:mb-3 text-base sm:text-lg">
                     No Refund Policy
                   </h3>
                   <p className="mb-3">
@@ -199,7 +197,7 @@ const PoliciesPage = () => {
                   <p>
                     This policy applies regardless of:
                   </p>
-                  <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
+                  <ul className="list-disc list-inside space-y-1 ml-2 sm:ml-4 mt-2">
                     <li>How much you have used the service</li>
                     <li>Whether you change your mind after purchase</li>
                     <li>Technical issues on your end</li>
@@ -231,11 +229,11 @@ const PoliciesPage = () => {
             </section>
 
             {/* Privacy Policy */}
-            <section className="bg-white dark:bg-neutral-900/60 rounded-2xl p-8 border border-neutral-200 dark:border-neutral-800/50">
-              <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">
+            <section className="bg-white dark:bg-neutral-900/60 rounded-xl sm:rounded-2xl p-5 sm:p-8 border border-neutral-200 dark:border-neutral-800/50">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-4 sm:mb-6">
                 Privacy Policy
               </h2>
-              <div className="space-y-4 text-neutral-700 dark:text-neutral-300">
+              <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-neutral-700 dark:text-neutral-300">
                 <div>
                   <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">
                     1. Data Collection
@@ -280,11 +278,11 @@ const PoliciesPage = () => {
             </section>
 
             {/* Usage Limits */}
-            <section className="bg-white dark:bg-neutral-900/60 rounded-2xl p-8 border border-neutral-200 dark:border-neutral-800/50">
-              <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">
+            <section className="bg-white dark:bg-neutral-900/60 rounded-xl sm:rounded-2xl p-5 sm:p-8 border border-neutral-200 dark:border-neutral-800/50">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-4 sm:mb-6">
                 Usage Limits & Fair Use
               </h2>
-              <div className="space-y-4 text-neutral-700 dark:text-neutral-300">
+              <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-neutral-700 dark:text-neutral-300">
                 <p>
                   While Pro users have access to unlimited iterations and projects, we expect all users 
                   to use our service fairly and reasonably. Excessive or abusive use that impacts service 
@@ -294,7 +292,7 @@ const PoliciesPage = () => {
                   <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">
                     Examples of Excessive Use:
                   </h3>
-                  <ul className="list-disc list-inside space-y-1 ml-4">
+                  <ul className="list-disc list-inside space-y-1 ml-2 sm:ml-4">
                     <li>Automated or bot-driven generation requests</li>
                     <li>Commercial reselling of generated content</li>
                     <li>Intentional system abuse or exploitation</li>
@@ -305,11 +303,11 @@ const PoliciesPage = () => {
             </section>
 
             {/* Service Availability */}
-            <section className="bg-white dark:bg-neutral-900/60 rounded-2xl p-8 border border-neutral-200 dark:border-neutral-800/50">
-              <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">
+            <section className="bg-white dark:bg-neutral-900/60 rounded-xl sm:rounded-2xl p-5 sm:p-8 border border-neutral-200 dark:border-neutral-800/50">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-4 sm:mb-6">
                 Service Availability & Changes
               </h2>
-              <div className="space-y-4 text-neutral-700 dark:text-neutral-300">
+              <div className="space-y-3 sm:space-y-4 text-sm sm:text-base text-neutral-700 dark:text-neutral-300">
                 <div>
                   <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">
                     1. Service Uptime
@@ -344,11 +342,11 @@ const PoliciesPage = () => {
             </section>
 
             {/* Contact Information */}
-            <section className="bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-900/20 dark:to-neutral-900/60 rounded-2xl p-8 border border-purple-200 dark:border-purple-800/30">
-              <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6">
+            <section className="bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-900/20 dark:to-neutral-900/60 rounded-xl sm:rounded-2xl p-5 sm:p-8 border border-purple-200 dark:border-purple-800/30">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-4 sm:mb-6">
                 Contact Us
               </h2>
-              <div className="space-y-3 text-neutral-700 dark:text-neutral-300">
+              <div className="space-y-2 sm:space-y-3 text-sm sm:text-base text-neutral-700 dark:text-neutral-300">
                 <p>
                   If you have any questions about these policies or need support, please contact us:
                 </p>
@@ -364,8 +362,8 @@ const PoliciesPage = () => {
             </section>
 
             {/* Agreement */}
-            <section className="bg-neutral-100 dark:bg-neutral-900/40 rounded-2xl p-8 border border-neutral-200 dark:border-neutral-800/30">
-              <p className="text-neutral-700 dark:text-neutral-300 text-center">
+            <section className="bg-neutral-100 dark:bg-neutral-900/40 rounded-xl sm:rounded-2xl p-5 sm:p-8 border border-neutral-200 dark:border-neutral-800/30">
+              <p className="text-sm sm:text-base text-neutral-700 dark:text-neutral-300 text-center">
                 By using Zap, you acknowledge that you have read, understood, and agree to be bound by 
                 these policies. If you do not agree with any part of these policies, please do not use 
                 our service.

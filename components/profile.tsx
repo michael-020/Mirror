@@ -84,7 +84,7 @@ export function Profile() {
     const downloadLimit = 5
 
     return (
-        <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+        <div className="bg-neutral-50 dark:bg-neutral-950 h-screen overflow-y-auto custom-scrollbar">
             <Navbar 
                 onBack={handleBackToInitializer}
                 onPanelToggle={() => setIsOpen(!isOpen)}
@@ -116,7 +116,7 @@ export function Profile() {
                                 Downloads: {isPremium ? downloadCount : `${downloadCount}/${downloadLimit}`}
                             </span>
                             {!isPremium && downloadCount >= downloadLimit && (
-                                <span className="ml-1 px-2 py-0.5 text-xs font-medium rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+                                <span className="ml-1 px-2 py-0.5 text-xs font-medium rounded bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">
                                     Limit reached
                                 </span>
                             )}
