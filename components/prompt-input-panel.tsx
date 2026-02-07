@@ -278,11 +278,11 @@ export function PromptInputPanel({
 
   return (
     <>
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {imagePreviews.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-2 sm:space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-sm sm:text-lg font-semibold text-white">
               Selected Images ({imagePreviews.length})
               {/* {isProcessingImages && (
                 <span className="ml-2 text-sm text-neutral-400">
@@ -293,31 +293,31 @@ export function PromptInputPanel({
             <button
               type="button"
               onClick={removeAllImages}
-              className="text-sm text-neutral-400 hover:text-neutral-500 transition-colors"
+              className="text-xs sm:text-sm text-neutral-400 hover:text-neutral-500 transition-colors"
             >
               Remove All
             </button>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-5 md:grid-cols-8 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-5 md:grid-cols-8 gap-2 sm:gap-4">
             {imagePreviews.map((preview, index) => (
               <div key={index} className="relative group">
                 <button 
                   type="button"
                   onClick={() => openImageModal(preview)} 
-                  className="aspect-square size-20 rounded-sm overflow-hidden bg-neutral-800"
+                  className="aspect-square size-16 sm:size-20 rounded-sm overflow-hidden bg-neutral-800"
                 >
                   <img
                     src={preview}
                     alt={`Preview ${index + 1}`}
-                    className="object-cover size-20"
+                    className="object-cover size-16 sm:size-20"
                   />
                 </button>
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="absolute -top-2 -right-2 bg-neutral-700 hover:bg-neutral-800 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-neutral-700 hover:bg-neutral-800 text-white rounded-full p-0.5 sm:p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <X className="size-4" />
+                  <X className="size-3 sm:size-4" />
                 </button>
               </div>
             ))}
@@ -335,7 +335,7 @@ export function PromptInputPanel({
         >
           {isDragging && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-neutral-50 dark:bg-neutral-900/80 rounded-xl border-2 border-dashed border-blue-500">
-              <p className="text-white text-lg font-semibold">Drop images here</p>
+              <p className="text-white text-sm sm:text-lg font-semibold">Drop images here</p>
             </div>
           )}
           
@@ -351,7 +351,7 @@ export function PromptInputPanel({
               className={textareaClassName}
             />
             {!isPremium && showLimit && (
-              <div className={`absolute bottom-3 right-4 text-xs pointer-events-none ${
+              <div className={`absolute bottom-2 sm:bottom-3 right-3 sm:right-4 text-[10px] sm:text-xs pointer-events-none ${
                 description.length > CHAR_LIMIT 
                 ? 'text-red-600/79' 
                 : 'text-neutral-600 dark:text-neutral-500'
@@ -360,7 +360,7 @@ export function PromptInputPanel({
               </div>
             )}
           </div>
-          <div className=" flex items-center justify-between px-4">
+          <div className="flex items-center justify-between px-3 sm:px-4">
             
             <div className="relative">
               <button
@@ -370,7 +370,7 @@ export function PromptInputPanel({
                 aria-label="Upload Images"
                 disabled={isProcessingImages || disabled}
               >
-                <Plus className={`${imageSelectorSize ? `size-${imageSelectorSize}` : "size-6"} transition-colors ${
+                <Plus className={`${imageSelectorSize ? `size-${imageSelectorSize}` : "size-5 sm:size-6"} transition-colors ${
                   isProcessingImages 
                   ? 'text-blue-400 animate-pulse' 
                   : 'text-neutral-500 hover:text-neutral-300'
@@ -389,14 +389,14 @@ export function PromptInputPanel({
               disabled={isProcessingImages || disabled}
             />
             
-            <div className={` ${submitButtonSize ? "bottom-2 right-0.5": "bottom-4 right-4" } pt-0 p-3 pr-0 flex items-center justify-center gap-2`}>
+            <div className={` ${submitButtonSize ? "bottom-2 right-0.5": "bottom-3 sm:bottom-4 right-3 sm:right-4" } pt-0 p-2 sm:p-3 pr-0 flex items-center justify-center gap-1.5 sm:gap-2`}>
             {!isPremium && (
               <div className="flex gap-1 items-center justify-center min-h-[1rem]">
                 {isFetchingUsage ? (
                   <UsageSkeleton textSize={usageTextSize} />
                 ) : usageInfo ? (
                   <button
-                    className={`${usageTextSize ?? "text-sm"} text-neutral-600 dark:text-neutral-400`}
+                    className={`${usageTextSize ?? "text-xs sm:text-sm"} text-neutral-600 dark:text-neutral-400`}
                   >
                     {usageInfo.limitReached
                       ? 'Daily limit reached'
@@ -411,7 +411,7 @@ export function PromptInputPanel({
               type="button"
               onClick={handleSubmit}
               disabled={isDisabled}
-              className={`${ submitButtonSize ? "p-1 rounded-lg" : "p-2 rounded-xl" }  font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+              className={`${ submitButtonSize ? "p-1 rounded-lg" : "p-1.5 sm:p-2 rounded-lg sm:rounded-xl" }  font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                 isDisabled
                   ? 'bg-neutral-300 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-500 cursor-not-allowed'
                   : 'bg-neutral-800 dark:bg-neutral-300 dark:hover:bg-neutral-400 text-neutral-100 dark:text-black shadow-lg'
@@ -420,7 +420,7 @@ export function PromptInputPanel({
               {!isSubmitting ? (
                 <ArrowUp className={`${submitButtonSize ? `size-${submitButtonSize}` : "size-4"}`} />
               ) : (
-                <LoaderPinwheel className="animate-spin w-5 h-5" />
+                <LoaderPinwheel className="animate-spin w-4 h-4 sm:w-5 sm:h-5" />
               )}
             </button>
           </div>

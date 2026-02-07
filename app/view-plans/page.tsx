@@ -12,7 +12,7 @@ const ViewPlansPage = () => {
   const router = useRouter()
   const { isPremium, setPremiumStatus } = useAuthStore()
   const { data: session, status } = useSession()
-
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -53,7 +53,7 @@ const ViewPlansPage = () => {
   }
 
   return (
-    <div className="overflow-hidden">
+    <div className="h-screen overflow-y-auto custom-scrollbar pt-10 sm:pt-0">
       <Navbar
         onBack={() => router.push("/chat")}
         showBackButton
@@ -63,11 +63,11 @@ const ViewPlansPage = () => {
 
       <div className="min-h-screen bg-neutral-50 dark:bg-black translate-y-8 flex items-center justify-center p-4">
         <div className="w-full max-w-6xl">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white mb-4">
+          <div className="text-center mb-5 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white md-2 sm:mb-4">
               {isPremium ? "You're on the Pro plan" : "Choose Your Plan"}
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 text-lg">
+            <p className="text-neutral-600 dark:text-neutral-400 text-[0.88rem] sm:text-lg">
               Design, generate, and ship websites faster with Zap.
             </p>
           </div>
@@ -131,18 +131,39 @@ const ViewPlansPage = () => {
                   <Feature text="Unlimited projects & downloads" />
                 </div>
 
-                {!isPremium && <button
-                  disabled={isPremium}
-                  onClick={() => !isPremium && handleSubscribe()}
-                  className={`mt-10 w-full py-3.5 rounded-lg font-semibold transition-all ${
-                    isPremium
-                      ? "bg-purple-500/20 text-purple-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-lg shadow-purple-500/30"
-                  }`}
-                >
-                  Upgrade to Pro
-                </button>
-                }
+                {!isPremium && (
+                  <>
+                    <label className="mt-8 mb-4 flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={acceptedTerms}
+                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        className="mt-1 accent-purple-500"
+                      />
+                      <span>
+                        I accept the{" "}
+                        <a
+                          href="/policies"
+                          className="text-purple-500 hover:text-purple-600 underline"
+                        >
+                          Terms and Conditions
+                        </a>
+                      </span>
+                    </label>
+
+                    <button
+                      disabled={!acceptedTerms}
+                      onClick={() => acceptedTerms && handleSubscribe()}
+                      className={`w-full py-3.5 rounded-lg font-semibold transition-all ${
+                        acceptedTerms
+                          ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 shadow-lg shadow-purple-500/30"
+                          : "bg-purple-500/20 text-purple-400 cursor-not-allowed"
+                      }`}
+                    >
+                      Upgrade to Pro
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 

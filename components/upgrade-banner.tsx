@@ -10,14 +10,14 @@ export function UpgradeBanner({ visible, onClose }: UpgradeBannerProps) {
   if (!visible) return null;
 
   return (
-    <div className="flex items-center justify-between px-4 pt-6 py-2 -z-40 -translate-y-9 bg-neutral-800/0 border border-t-0 border-neutral-200 dark:border-neutral-800 rounded-b-xl">
-      <div className="text-neutral-800 dark:text-neutral-400 text-sm">
+    <div className="flex items-center justify-between px-3 sm:px-4 pt-6 sm:pt-6 py-2 -z-40 -translate-y-7 sm:-translate-y-9 bg-neutral-800/0 border border-t-0 border-neutral-200 dark:border-neutral-800 rounded-b-xl">
+      <div className="text-neutral-800 dark:text-neutral-400 text-[0.7rem] sm:text-sm">
         Upgrade to Pro to unlock all of Zap&apos;s features
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <Link 
           href="/view-plans"
-          className="text-sm text-purple-400 hover:text-purple-400/80 transition-colors"
+          className="text-[0.65rem] sm:text-sm text-purple-400 hover:text-purple-400/80 transition-colors whitespace-nowrap"
         >
           Upgrade Plan
         </Link>
@@ -25,7 +25,7 @@ export function UpgradeBanner({ visible, onClose }: UpgradeBannerProps) {
           onClick={onClose}
           className="text-neutral-500 hover:text-neutral-400 transition-colors"
         >
-          <X className="size-4" />
+          <X className="size-3.5 sm:size-4" />
         </button>
       </div>
     </div>
