@@ -75,11 +75,7 @@ const ViewPlansPage = () => {
           <div className="grid md:grid-cols-2 gap-8">
 
             <div
-              className={`p-8 rounded-2xl border-2 ${
-                !isPremium
-                  ? "border-purple-500/50 bg-white dark:bg-neutral-900/90 shadow-xl shadow-purple-500/20"
-                  : "border-neutral-200 dark:border-neutral-800/50 bg-white dark:bg-neutral-900/60"
-              } transition-all duration-300`}
+              className={`p-8 rounded-2xl border-2 border-neutral-200 dark:border-neutral-800/50 bg-white dark:bg-neutral-900/60 transition-all duration-300`}
             >
               <div className="flex flex-col h-full">
                 <h2 className="text-3xl font-bold text-neutral-900 dark:text-white">Free</h2>
