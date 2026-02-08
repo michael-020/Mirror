@@ -53,7 +53,7 @@ const ViewPlansPage = () => {
   }
 
   return (
-    <div className="h-screen overflow-y-auto custom-scrollbar pt-10 sm:pt-0">
+    <div className="h-screen overflow-y-auto md:overflow-y-hidden custom-scrollbar pt-7 sm:pt-0 md:pt-0">
       <Navbar
         onBack={() => router.push("/chat")}
         showBackButton

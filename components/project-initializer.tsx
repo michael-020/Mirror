@@ -112,7 +112,7 @@ export function ProjectInitializer() {
   }
 
   return (
-    <div className="relative min-h-screen bg-neutral-50 dark:bg-black">
+    <div className="relative min-h-screen bg-neutral-50 dark:bg-black overflow-hidden">
       <Navbar
         onPanelToggle={() => setIsOpen(!isOpen)}
         showPanelToggle
@@ -121,7 +121,7 @@ export function ProjectInitializer() {
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4 sm:px-6 pt-24 sm:pt-32 pb-20">
         <div className="w-full max-w-3xl mx-auto">
           <div className="space-y-10 sm:space-y-12">
-            <div className="text-center space-y-3 sm:space-y-4">
+            <div className="text-center space-y-3 sm:space-y-4 sticky">
               <h1 className="text-3xl sm:text-3xl md:text-5xl font-black text-neutral-950 dark:text-white leading-snug sm:leading-tight">
                 Start with a sentence.
               </h1>
