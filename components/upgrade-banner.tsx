@@ -14,7 +14,7 @@ export function UpgradeBanner({ visible, onClose }: UpgradeBannerProps) {
       <div className="text-neutral-800 dark:text-neutral-400 text-[0.7rem] sm:text-sm">
         Upgrade to Pro to unlock all of Zap&apos;s features
       </div>
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex items-center gap-5 sm:gap-4">
         <Link 
           href="/view-plans"
           className="text-[0.65rem] sm:text-sm text-purple-400 hover:text-purple-400/80 transition-colors whitespace-nowrap"
