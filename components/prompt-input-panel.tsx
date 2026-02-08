@@ -9,7 +9,7 @@ import { UpgradeBanner } from "./upgrade-banner"
 import { showErrorToast } from "@/lib/toast"
 import { useAuthStore } from "@/stores/authStore/useAuthStore"
 import { UsageSkeleton } from "./usage-skeleton"
-import { BrowserSupportModal, isBrowserSupported } from "./browser-support-modal"
+import { BrowserSupportModal, isSupportedEnvironment } from "./browser-support-modal"
 
 async function convertToWebP(file: File, quality: number = 0.8): Promise<File> {
   return new Promise((resolve, reject) => {
@@ -250,7 +250,7 @@ export function PromptInputPanel({
   };
 
   const handleSubmit = () => {
-    if (showSupportModal && !isBrowserSupported()) {
+    if (showSupportModal && !isSupportedEnvironment()) {
       setShowBrowserModal(true)
       return
     }
@@ -449,7 +449,6 @@ export function PromptInputPanel({
     {showBrowserModal && (
       <BrowserSupportModal 
         isOpen={true}
-        onClose={() => setShowBrowserModal(false)}
       />
     )}
     </>
