@@ -113,6 +113,9 @@ export function ProjectInitializer() {
 
   return (
     <div className="relative min-h-screen bg-neutral-50 dark:bg-black overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 flex justify-center">
+        <div className="w-[800px] h-[800px] bg-gradient-to-tr from-blue-400/10 via-purple-400/10 to-pink-400/10 blur-3xl rounded-full mt-[-200px]" />
+      </div>
       <Navbar
         onPanelToggle={() => setIsOpen(!isOpen)}
         showPanelToggle
