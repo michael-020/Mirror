@@ -40,9 +40,9 @@ export default function Landing() {
         </div>
 
         <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/70 dark:bg-neutral-950/70 border-b border-neutral-200/60 dark:border-neutral-800/60">
-          <div className="max-w-6xl mx-auto px-6">
+          <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between h-16">
-              <div className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white select-none">
+              <div className="text-xl font-bold tracking-tight font-stretch-extra-expanded text-neutral-900 dark:text-white select-none">
                 Zap
               </div>
 
@@ -66,7 +66,6 @@ export default function Landing() {
         </nav>
 
         <div className="flex-1 flex flex-col pt-16 relative z-10">
-          {/* Mobile layout */}
           <div className="md:hidden flex flex-col min-h-full">
             <div className="flex-1 px-5 pt-12 pb-6">
               <div className="text-center mb-6 max-w-2xl mx-auto">
@@ -87,7 +86,6 @@ export default function Landing() {
               </p>
             </div>
 
-            {/* Input panel */}
             <div className="px-4 pb-4">
               <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg dark:shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden ring-1 ring-neutral-900/5 dark:ring-white/5">
                 <PromptInputPanel
@@ -191,7 +189,6 @@ export default function Landing() {
                 </div>
               </div>
               
-              {/* Trust indicator */}
               <div className="flex items-center justify-center gap-2 mt-6 text-sm text-neutral-500 dark:text-neutral-500">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -202,9 +199,8 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Footer for desktop only */}
         <footer className="hidden md:block relative z-10 border-t border-neutral-200/60 dark:border-neutral-800/60 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl mt-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-9 py-8 sm:py-12">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
               <div className="flex flex-col items-center md:items-start gap-2 sm:gap-3">
                 <div className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white select-none tracking-tight">
