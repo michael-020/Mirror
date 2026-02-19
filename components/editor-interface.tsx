@@ -10,6 +10,7 @@ import { redirect } from "next/navigation"
 import Navbar from "./navbar"
 import RightSidebar from "./sidebar"
 import { InitLoadingModal } from "./init-loading-modal"
+import { Group, Panel, Separator } from "react-resizable-panels"
 
 export function EditorInterface({
   onBack,
@@ -23,9 +24,6 @@ export function EditorInterface({
   const { data: session, status } = useSession()
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [leftPanelWidth, setLeftPanelWidth] = useState(25) 
-  const [isResizing, setIsResizing] = useState(false)
-  const resizerRef = useRef<HTMLDivElement>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   
   const sidebarVisible = isOpen || isHovered;
@@ -65,40 +63,6 @@ export function EditorInterface({
     document.addEventListener("mousemove", onMouseMove);
     return () => document.removeEventListener("mousemove", onMouseMove);
   }, [isHovered]);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) return
-      
-      const containerWidth = window.innerWidth
-      const newWidth = (e.clientX / containerWidth) * 100
-      const clampedWidth = Math.max(15, Math.min(50, newWidth))
-      setLeftPanelWidth(clampedWidth)
-    }
-
-    const handleMouseUp = () => {
-      setIsResizing(false)
-      document.body.style.cursor = 'default'
-      document.body.style.userSelect = 'auto'
-    }
-
-    if (isResizing) {
-      document.body.style.cursor = 'col-resize'
-      document.body.style.userSelect = 'none'
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isResizing])
-
-  const handleResizerMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsResizing(true)
-  }
  
   const handleSidebarMouseLeave = () => {
     setIsHovered(false);
@@ -117,7 +81,7 @@ export function EditorInterface({
    }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900 text-white">
+    <div className="h-screen flex flex-col bg-neutral-50 dark:bg-black text-white">
       <Navbar
         onPanelToggle={() => setIsOpen(!isOpen)}
         showPanelToggle={true}
@@ -126,24 +90,26 @@ export function EditorInterface({
       />
 
       <div className="flex fixed top-[60px] h-[calc(100vh-60px)] w-screen">
-        {!isFullscreen && (
-          <div 
-          className="dark:bg-neutral-950 bg-neutral-50 border-r border-neutral-200 dark:border-neutral-800 flex-shrink-0"
-          style={{ width: `${leftPanelWidth}%` }}
-          >
-          <StatusPanel />
-        </div>
-        )}
-        <div
-          ref={resizerRef}
-          className="w-0.5 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 cursor-col-resize flex justify-center flex-shrink-0 transition-colors duration-150 relative group"
-          onMouseDown={handleResizerMouseDown}
-        >
-          <div className="absolute w-1.5 h-6 inset-y-0 top-1/2 -translate-y-1/2 bg-neutral-200 group-hover:bg-neutral-300 dark:bg-neutral-600 dark:group-hover:bg-neutral-500 rounded-md transition-opacity duration-150" />
-        </div>
-        <div className=" flex-1 min-w-0">
-          <EditorWorkspace isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
-        </div>
+        <Group>
+          {!isFullscreen && (
+            <Panel collapsible defaultSize={"25%"} minSize={"10%"}>
+              <div 
+                className="dark:bg-neutral-950 bg-neutral-50 border-r border-neutral-200 dark:border-neutral-800"
+              >
+                <StatusPanel />
+              </div>
+            </Panel>
+          )}
+          <Separator className="relative w-0.5 bg-neutral-300 dark:bg-neutral-800 [&[data-separator='hover']]:bg-neutral-400 [&[data-separator='active']]:bg-neutral-500/90  dark:[&[data-separator='hover']]:bg-neutral-700 dark:[&[data-separator='active']]:bg-neutral-600 flex justify-center outline-none focus:outline-none focus:ring-0">
+            <div className="absolute top-1/2 -translate-y-1/2 w-2 h-8 rounded-md bg-neutral-400 dark:bg-neutral-600 hover:bg-neutral-500 dark:hover:bg-neutral-500 transition-colors duration-150" />
+          </Separator>
+
+          <Panel minSize={"20vw"}>
+            <div className=" ">
+              <EditorWorkspace isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
+            </div>
+          </Panel>
+        </Group>
       </div>
 
       {shouldInitialize && (isInitialising || isInitialisingWebContainer) && <InitLoadingModal message={`${isInitialisingWebContainer ? "Initialising Environment..." : "Initialising project..."}`} />}
