@@ -131,7 +131,7 @@ export default function Landing() {
         </nav>
 
         {/* Hero - Desktop */}
-        <div className="hidden md:flex flex-1 flex-col items-center justify-center px-6 pt-32 pb-16 relative z-10">
+        <div className="hidden md:flex flex-1 flex-col items-center justify-center px-6 pt-[7.3rem] pb-16 relative z-10">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -219,13 +219,13 @@ export default function Landing() {
 
         {/* Hero - Mobile */}
         <div className="md:hidden flex flex-col min-h-full relative z-10">
-          <div className="flex-1 px-5 pt-36 pb-6">
+          <div className="flex-1 px-5 pt-56 pb-6">
             <motion.div initial="hidden" animate="visible" className="text-center mb-8 max-w-2xl mx-auto">
 
               <motion.h1
                 variants={fadeUp}
                 custom={0.1}
-                className="text-3xl font-black tracking-tight text-white leading-tight"
+                className="text-[2rem] font-black tracking-tight text-white leading-tight"
                 style={{ fontFamily: "'Syne', sans-serif" }}
               >
                 Start with a sentence.
@@ -233,7 +233,7 @@ export default function Landing() {
               <motion.h2
                 variants={fadeUp}
                 custom={0.2}
-                className="text-3xl font-black bg-gradient-to-r from-purple-300 via-purple-400 to-purple-500 bg-clip-text text-transparent mt-1 leading-tight"
+                className="text-[2rem] font-black bg-gradient-to-r from-purple-300 via-purple-400 to-purple-500 bg-clip-text text-transparent mt-1 leading-tight"
                 style={{ fontFamily: "'Syne', sans-serif" }}
               >
                 End with a website.
