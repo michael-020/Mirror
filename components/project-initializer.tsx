@@ -173,7 +173,7 @@ export function ProjectInitializer() {
               <motion.p
                 variants={fadeUp}
                 custom={0.3}
-                className="text-[1rem] sm:text-base md:text-lg text-neutral-400 max-w-md sm:max-w-xl mx-auto pt-3"
+                className="text-[0.9rem] sm:text-base md:text-lg text-neutral-400 max-w-md sm:max-w-xl mx-auto pt-3"
               >
                 Create stunning websites by chatting with Zap.
               </motion.p>
