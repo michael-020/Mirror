@@ -7,6 +7,39 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ThemeToggle } from './theme-toggle'
 
+function EmailDisplay({ email }: { email: string }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const textRef = useRef<HTMLDivElement>(null)
+  const [isOverflowing, setIsOverflowing] = useState(false)
+
+  useEffect(() => {
+    const container = containerRef.current
+    const text = textRef.current
+    if (container && text) {
+      setIsOverflowing(text.scrollWidth > container.clientWidth)
+    }
+  }, [email])
+
+  return (
+    <div ref={containerRef} className="relative overflow-hidden">
+      {/* Fade-out mask on right edge — only shown when overflowing and not hovered */}
+      {isOverflowing && (
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-neutral-50 dark:from-[#101010] to-transparent z-10 group-hover/email:opacity-0 transition-opacity duration-300" />
+      )}
+      <div
+        ref={textRef}
+        className={`text-sm font-medium text-neutral-900 dark:text-white whitespace-nowrap ${
+          isOverflowing
+            ? 'group-hover/email:-translate-x-[40%] transition-transform duration-[2000ms] ease-linear'
+            : ''
+        }`}
+      >
+        {email}
+      </div>
+    </div>
+  )
+}
+
 export default function UserDropdown() {
   const { data: session } = useSession()
   const router = useRouter()
@@ -26,76 +59,46 @@ export default function UserDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  if (!session) {
-    return null 
-  }
+  if (!session) return null
 
   return (
     <div className="relative" ref={dropdownRef}>
-        <motion.button
-            className={`flex select-none items-center justify-center size-8 text-white cursor-pointer rounded-full shadow-lg ring-2 
-                bg-gradient-to-br from-neutral-600 to-neutral-700 
-                hover:from-neutral-500 hover:to-neutral-600 
-                dark:from-neutral-700 dark:to-neutral-800 
-                dark:hover:from-neutral-600 dark:hover:to-neutral-700 
-                hover:shadow-2xl 
-                transition-all duration-200 ease-in-out 
-                ${dropdownOpen ? 'ring-neutral-500 dark:ring-neutral-800' : 'ring-transparent'}`}
-            onClick={() => setDropdownOpen((prev) => !prev)}
-            whileHover={{
-                scale: 1.05,
-            }}
-            whileTap={{ scale: 0.95 }}
-            animate={{
-                scale: dropdownOpen ? 1.05 : 1,
-                transition: { duration: 0.2 },
-            }}
-            aria-haspopup="true"
-            aria-expanded={dropdownOpen}
-            >
-            <motion.span
-                className="text-sm font-semibold"
-                animate={{
-                rotate: dropdownOpen ? 360 : 0,
-                transition: { duration: 0.3, ease: 'easeInOut' },
-                }}
-            >
-                {session.user.email.charAt(0).toUpperCase()}
-            </motion.span>
-        </motion.button>
+      <motion.button
+        className={`flex select-none items-center justify-center size-8 text-white cursor-pointer rounded-full shadow-lg ring-2 
+          bg-gradient-to-br from-neutral-600 to-neutral-700 
+          hover:from-neutral-500 hover:to-neutral-600 
+          dark:from-neutral-700 dark:to-neutral-800 
+          dark:hover:from-neutral-600 dark:hover:to-neutral-700 
+          hover:shadow-2xl 
+          transition-all duration-200 ease-in-out 
+          ${dropdownOpen ? 'ring-neutral-500 dark:ring-neutral-800' : 'ring-transparent'}`}
+        onClick={() => setDropdownOpen((prev) => !prev)}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        animate={{ scale: dropdownOpen ? 1.05 : 1, transition: { duration: 0.2 } }}
+        aria-haspopup="true"
+        aria-expanded={dropdownOpen}
+      >
+        <motion.span
+          className="text-sm font-semibold"
+          animate={{ rotate: dropdownOpen ? 360 : 0, transition: { duration: 0.3, ease: 'easeInOut' } }}
+        >
+          {session.user.email.charAt(0).toUpperCase()}
+        </motion.span>
+      </motion.button>
 
       <AnimatePresence>
         {dropdownOpen && (
           <motion.div
             className="absolute right-0 w-52 mt-3.5 backdrop-blur-md border bg-neutral-50 dark:bg-[#101010] border-neutral-200 dark:border-neutral-700/50 rounded-xl shadow-2xl z-50 overflow-hidden"
-            initial={{
-              opacity: 0,
-              scale: 0.9,
-              y: -10,
-              filter: 'blur(4px)',
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              y: 0,
-              filter: 'blur(0px)',
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.95,
-              y: -5,
-              filter: 'blur(2px)',
-            }}
-            transition={{
-              duration: 0.2,
-              ease: [0.4, 0.0, 0.2, 1],
-            }}
+            initial={{ opacity: 0, scale: 0.9, y: -10, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, scale: 0.95, y: -5, filter: 'blur(2px)' }}
+            transition={{ duration: 0.2, ease: [0.4, 0.0, 0.2, 1] }}
             style={{ transformOrigin: 'top right' }}
           >
-            <div className="absolute inset-0 pointer-events-none" />
-
             <motion.div
-              className="px-4 py-3 border-b border-neutral-200 dark:border-neutral-700/50 bg-neutral-50 dark:bg-[#101010]"
+              className="group/email px-4 py-3 border-b border-neutral-200 dark:border-neutral-700/50 bg-neutral-50 dark:bg-[#101010]"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1, duration: 0.2 }}
@@ -103,36 +106,24 @@ export default function UserDropdown() {
               <div className="text-xs text-neutral-600 dark:text-neutral-400 font-medium uppercase tracking-wider mb-1">
                 Signed in as
               </div>
-              <div className="relative overflow-hidden">
-                <div className="text-sm font-medium text-neutral-900 dark:text-white whitespace-nowrap transition-transform duration-2000 ease-linear hover:-translate-x-[40%]">
-                  {session.user.email}
-                </div>
-              </div>
+              <EmailDisplay email={session.user.email} />
             </motion.div>
 
             <div className="py-2 px-2">
               <motion.button
-                onClick={() => {
-                  setDropdownOpen(false)
-                  router.push('/profile')
-                }}
+                onClick={() => { setDropdownOpen(false); router.push('/profile') }}
                 className="w-full text-left px-4 py-3 rounded-lg text-sm text-neutral-900 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800/60 flex items-center gap-3 group relative overflow-hidden"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.15, duration: 0.2 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <motion.div
-                  className="flex items-center justify-center size-8 bg-neutral-200 dark:bg-neutral-700/50 rounded-lg group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600/50 transition-colors duration-200 relative z-10"
-                  transition={{ duration: 0.2 }}
-                >
+                <motion.div className="flex items-center justify-center size-8 bg-neutral-200 dark:bg-neutral-700/50 rounded-lg group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600/50 transition-colors duration-200 relative z-10">
                   <User className="size-4" />
                 </motion.div>
                 <div className="flex flex-col relative z-10">
                   <span className="font-medium">Profile</span>
-                  <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Manage your profile
-                  </span>
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400">Manage your profile</span>
                 </div>
               </motion.button>
 
@@ -148,27 +139,19 @@ export default function UserDropdown() {
               <div className="h-px mx-4 my-2 bg-neutral-200 dark:bg-neutral-700/50" />
 
               <motion.button
-                onClick={() => {
-                  setDropdownOpen(false)
-                  signOut({ callbackUrl: '/signin' })
-                }}
+                onClick={() => { setDropdownOpen(false); signOut({ callbackUrl: '/signin' }) }}
                 className="w-full text-left px-4 py-3 text-sm rounded-lg text-red-600 dark:text-red-400 hover:bg-red-500/10 flex items-center gap-3 group relative overflow-hidden"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.25, duration: 0.2 }} 
+                transition={{ delay: 0.25, duration: 0.2 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <motion.div
-                  className="flex items-center justify-center size-8 bg-red-500/20 rounded-lg group-hover:bg-red-500/30 transition-colors duration-200 relative z-10"
-                  transition={{ duration: 0.2 }}
-                >
+                <motion.div className="flex items-center justify-center size-8 bg-red-500/20 rounded-lg group-hover:bg-red-500/30 transition-colors duration-200 relative z-10">
                   <LogOut className="size-4" />
                 </motion.div>
                 <div className="flex flex-col relative z-10">
                   <span className="font-medium">Sign out</span>
-                  <span className="text-xs text-red-500/70 dark:text-red-300/70">
-                    End your session
-                  </span>
+                  <span className="text-xs text-red-500/70 dark:text-red-300/70">End your session</span>
                 </div>
               </motion.button>
             </div>
