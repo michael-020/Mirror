@@ -144,7 +144,7 @@ export function ProjectInitializer() {
       />
 
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4 sm:px-6 pt-24 sm:pt-32 pb-20 relative z-10">
-        <div className="w-full max-w-3xl mx-auto">
+        <div className="w-full max-w-4xl mx-auto">
           <div className="space-y-10 sm:space-y-12">
             <motion.div
               initial="hidden"
@@ -155,7 +155,7 @@ export function ProjectInitializer() {
               <motion.h1
                 variants={fadeUp}
                 custom={0.1}
-                className="text-3xl sm:text-3xl md:text-4xl font-black text-black dark:text-white leading-snug sm:leading-tight"
+                className="text-3xl sm:text-3xl md:text-5xl font-black text-black dark:text-white leading-snug sm:leading-tight"
                 style={{ fontFamily: "'Syne', sans-serif" }}
               >
                 Start with a sentence.
@@ -164,7 +164,7 @@ export function ProjectInitializer() {
               <motion.h2
                 variants={fadeUp}
                 custom={0.2}
-                className="text-3xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-purple-300 via-purple-400 to-purple-500 bg-clip-text text-transparent leading-snug sm:leading-tight"
+                className="text-3xl sm:text-3xl md:text-5xl font-black bg-gradient-to-r from-purple-300 via-purple-400 to-purple-500 bg-clip-text text-transparent leading-snug sm:leading-tight"
                 style={{ fontFamily: "'Syne', sans-serif" }}
               >
                 End with a website.
