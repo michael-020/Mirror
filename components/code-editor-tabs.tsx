@@ -74,7 +74,7 @@ export function CodeEditorTabs({
 
   return (
     <>
-      <div className="bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 flex p-2 gap-4">
+      <div className="relative z-10 bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 flex p-2 gap-4">
         <div className="flex">
           <button
             onClick={() => onTabChange("code")}

@@ -89,12 +89,12 @@ export function EditorInterface({
         showBackButton={true}
       />
 
-      <div className="flex fixed top-[60px] h-[calc(100vh-60px)] w-screen">
+      <div className="flex fixed top-[60px] h-[calc(100vh-60px)] w-screen overflow-hidden">
         <Group>
           {!isFullscreen && (
-            <Panel collapsible defaultSize={"25%"} minSize={"10%"}>
+            <Panel collapsible defaultSize={"25%"} minSize={"17%"}>
               <div 
-                className="dark:bg-neutral-950 bg-neutral-50 border-r border-neutral-200 dark:border-neutral-800"
+                className="h-full bg-neutral-50 dark:bg-neutral-950 border-r border-neutral-200 dark:border-neutral-800 relative z-0"
               >
                 <StatusPanel />
               </div>
@@ -105,7 +105,7 @@ export function EditorInterface({
           </Separator>
 
           <Panel minSize={"20vw"}>
-            <div className=" ">
+            <div className="z-30">
               <EditorWorkspace isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} />
             </div>
           </Panel>

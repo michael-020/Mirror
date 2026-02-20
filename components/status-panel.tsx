@@ -172,7 +172,7 @@ export function StatusPanel() {
               </button>
             </div>
             {steps.length > 0 && (
-              <div title="outer-layer" className="space-y-2 ml-2 bg-neutral-100 dark:bg-neutral-900 px-3 p-2 rounded-lg">
+              <div className="space-y-2 ml-2 bg-neutral-100 dark:bg-neutral-900 px-3 p-2 rounded-lg">
                 {steps.filter(step => step.shouldExecute !== false).map((step) => (
                   <div key={step.id} className="flex items-start gap-3 py-0.5 group">
                     {getStatusIcon(step.status)}
