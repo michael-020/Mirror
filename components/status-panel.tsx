@@ -231,7 +231,7 @@ export function StatusPanel() {
           }}
           textareaHeight="1rem"
           textareaMaxHeight="10rem"
-          textareaClassName="placeholder:text-sm text-sm"
+          textareaClassName="placeholder:text-sm text-[0.94rem]"
           maxImages={10}
           submitButtonSize={"4"}
           imageSelectorSize={"5"}
