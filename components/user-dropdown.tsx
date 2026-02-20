@@ -103,8 +103,10 @@ export default function UserDropdown() {
               <div className="text-xs text-neutral-600 dark:text-neutral-400 font-medium uppercase tracking-wider mb-1">
                 Signed in as
               </div>
-              <div className="text-sm text-black dark:text-white font-medium truncate">
-                {session.user.email}
+              <div className="relative overflow-hidden">
+                <div className="text-sm font-medium text-neutral-900 dark:text-white whitespace-nowrap transition-transform duration-2000 ease-linear hover:-translate-x-[40%]">
+                  {session.user.email}
+                </div>
               </div>
             </motion.div>
 
