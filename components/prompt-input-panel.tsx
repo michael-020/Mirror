@@ -304,7 +304,7 @@ export function PromptInputPanel({
                 <button 
                   type="button"
                   onClick={() => openImageModal(preview)} 
-                  className="aspect-square size-16 sm:size-20 rounded-sm overflow-hidden bg-neutral-800"
+                  className="aspect-square size-16 sm:size-20 rounded-sm overflow-hidden bg-neutral-300 dark:bg-neutral-800"
                 >
                   <img
                     src={preview}
@@ -334,7 +334,7 @@ export function PromptInputPanel({
         >
           {isDragging && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-neutral-50 dark:bg-neutral-900/80 rounded-xl border-2 border-dashed border-blue-500">
-              <p className="text-white text-sm sm:text-lg font-semibold">Drop images here</p>
+              <p className="dark:text-neutral-200 text-neutral-800 text-sm sm:text-lg font-semibold">Drop images here</p>
             </div>
           )}
           
@@ -388,7 +388,7 @@ export function PromptInputPanel({
               disabled={isProcessingImages || disabled}
             />
             
-            <div className={` ${submitButtonSize ? "bottom-2 right-0.5": "bottom-3 sm:bottom-4 right-3 sm:right-4" } pt-0 p-2 sm:p-3 pr-0 flex items-center justify-center gap-1.5 sm:gap-2`}>
+            <div className={` ${submitButtonSize ? "bottom-2 right-0.5": "bottom-3 sm:bottom-4 right-3 sm:right-4" } pt-0 p-2 pr-0 sm:p-3 sm:pr-0 flex items-center justify-center gap-1.5 sm:gap-2`}>
             {!isPremium && (
               <div className="flex gap-1 items-center justify-center min-h-[1rem]">
                 {isFetchingUsage ? (
@@ -412,14 +412,14 @@ export function PromptInputPanel({
               disabled={isDisabled}
               className={`${ submitButtonSize ? "p-1 rounded-lg" : "p-1.5 sm:p-2 rounded-lg sm:rounded-xl" }  font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                 isDisabled
-                  ? 'bg-neutral-300 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-500 cursor-not-allowed'
+                  ? 'bg-neutral-300 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-300 cursor-not-allowed'
                   : 'bg-neutral-800 dark:bg-neutral-300 dark:hover:bg-neutral-400 text-neutral-100 dark:text-black shadow-lg'
               }`}
             >
               {!isSubmitting ? (
                 <ArrowUp className={`${submitButtonSize ? `size-${submitButtonSize}` : "size-4"}`} />
               ) : (
-                <LoaderPinwheel className="animate-spin w-4 h-4 sm:w-5 sm:h-5" />
+                <LoaderPinwheel className="animate-spin size-4 sm:size-5 " />
               )}
             </button>
           </div>

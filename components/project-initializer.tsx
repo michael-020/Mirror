@@ -122,12 +122,12 @@ export function ProjectInitializer() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#080810] overflow-hidden">
+    <div className="relative min-h-screen bg-white dark:bg-[#080810] overflow-hidden">
       {/* Background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-gradient-to-b from-purple-600/20 via-purple-800/10 to-transparent rounded-full blur-[120px]" />
-        <div className="absolute top-[30%] left-[10%] w-[400px] h-[400px] bg-purple-700/8 rounded-full blur-[100px]" />
-        <div className="absolute top-[20%] right-[5%] w-[350px] h-[350px] bg-purple-500/8 rounded-full blur-[100px]" />
+        <div className="absolute top-[30%] left-[10%] w-[400px] h-[400px] bg-purple-400 dark:bg-purple-700/8 rounded-full blur-[100px]" />
+        <div className="absolute top-[20%] right-[5%] w-[350px] h-[350px] bg-purple-300 dark:bg-purple-500/8 rounded-full blur-[100px]" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -135,7 +135,7 @@ export function ProjectInitializer() {
             backgroundSize: "60px 60px",
           }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,transparent_40%,#080810_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,transparent_40%,#fafafa_100%)] dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,transparent_40%,#080810_100%)]" />
       </div>
 
       <Navbar
@@ -155,7 +155,7 @@ export function ProjectInitializer() {
               <motion.h1
                 variants={fadeUp}
                 custom={0.1}
-                className="text-3xl sm:text-3xl md:text-4xl font-black text-white leading-snug sm:leading-tight"
+                className="text-3xl sm:text-3xl md:text-4xl font-black text-black dark:text-white leading-snug sm:leading-tight"
                 style={{ fontFamily: "'Syne', sans-serif" }}
               >
                 Start with a sentence.
@@ -173,7 +173,7 @@ export function ProjectInitializer() {
               <motion.p
                 variants={fadeUp}
                 custom={0.3}
-                className="text-[0.9rem] sm:text-base md:text-lg text-neutral-400 max-w-md sm:max-w-xl mx-auto pt-3"
+                className="text-[0.9rem] sm:text-base md:text-lg text-neutral-800 dark:text-neutral-400 max-w-md sm:max-w-xl mx-auto pt-3"
               >
                 Create stunning websites by chatting with Zap.
               </motion.p>
