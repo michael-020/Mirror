@@ -52,17 +52,14 @@ export function PreviewPanel() {
             const init = async () => {
                 // await setUpWebContainer()
                 if(!webcontainer) {
-                    console.log("return")
                     await setUpWebContainer()
                 }
                 
                 if(!webcontainer) {
-                    console.log("return")
                     return;
                 }
                 
                 const installProcess = await webcontainer.spawn('npm', ['install']);
-                console.log("npm i done")
                 
                 installProcess.output.pipeTo(new WritableStream({
                     write() {
@@ -70,10 +67,8 @@ export function PreviewPanel() {
                 }));
                 
                 await webcontainer.spawn('npm', ['run', 'dev']);
-                console.log("npm run dev")
                 
                 webcontainer.on('server-ready', (port, url) => {
-                    console.log("url: ", url)
                     setPreviewUrl(url)
                 });
             }

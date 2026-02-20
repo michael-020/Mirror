@@ -9,6 +9,5 @@ export async function capturePreviewImage(url: string) {
     const screenshotBase64 = await page.screenshot({ encoding: 'base64' });
 
     await browser.close();
-    console.log("image captured: ", screenshotBase64)
     return screenshotBase64;
 }

@@ -67,7 +67,6 @@ export function EditorPanel({ filePath }: EditorPanelProps) {
   // Handle file path changes
   useEffect(() => {
     if (currentFilePathRef.current !== filePath) {
-      console.log(`Switching to file: ${filePath}`);
       currentFilePathRef.current = filePath
       isUserEditingRef.current = false
       

@@ -45,10 +45,7 @@ export async function POST(req: NextRequest){
             process.env.PAYMENT_JWT_SECRET!
         );
 
-        console.log("payload: ", payload)
-
         const { amount } = await req.json();
-        console.log("amount: ", amount)
 
         const order = await razorpay.orders.create({
             amount: amount*100,

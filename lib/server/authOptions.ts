@@ -56,8 +56,6 @@ export const authOptions: AuthOptions = ({
       }
 
       if (trigger === "update" && session) {
-        console.log("updating user's premium status")
-        console.log("session: ", session)
 
         const dbUser = await prisma.user.findUnique({
           where: { id: session.user.id },
@@ -65,7 +63,6 @@ export const authOptions: AuthOptions = ({
         
         if (dbUser) {
           token.isPremium = dbUser.isPremium;
-          console.log("updated download count: ", dbUser?.downloadCount)
           token.downloadCount = dbUser.downloadCount;
 
           return token

@@ -237,7 +237,6 @@ export async function POST(req: NextRequest) {
       max_completion_tokens: 100_000
     });
 
-    console.log("completion: ", completion);
     
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
@@ -246,7 +245,6 @@ export async function POST(req: NextRequest) {
           for await (const chunk of completion) {
             const content = chunk.choices[0].delta.content;
             if (content) {
-              console.log(content);
               controller.enqueue(encoder.encode(content));
             }
           }

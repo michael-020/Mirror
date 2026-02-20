@@ -127,7 +127,7 @@ async function dismissPopups(page: Page) {
       console.error("Error while evaluating: ", e)
     }
   } catch (error) {
-    console.log('Error dismissing popups:', error);
+    console.error('Error dismissing popups:', error);
     // Don't throw, just continue
   }
 }
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
         const res = await axios.get(correctUrl, { timeout: 10000 });
 
         if (res.status === 404) {
-          console.log("URL not found:", res.data);
+          console.error("URL not found:", res.data);
           return NextResponse.json(
             { msg: "Url not found" },
             { status: 404 }

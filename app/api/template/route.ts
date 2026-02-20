@@ -65,8 +65,6 @@ export async function POST(req: NextRequest) {
         const url = lines.find(line => line.startsWith('url:'))?.replace('url:', '').trim() || 'not a url';
         const title = lines.find(line => line.startsWith('title:'))?.replace('title:', '').trim() || 'Untitled';
 
-        console.log('Extracted URL:', url);
-        console.log('Assigned Title:', title);
 
         return NextResponse.json(
             {
