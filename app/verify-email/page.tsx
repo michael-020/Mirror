@@ -9,43 +9,35 @@ import { useSession } from "next-auth/react";
 import { useAuthStore } from "@/stores/authStore/useAuthStore";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
-
 export default function VerifyEmailPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { setInputEmail } = useAuthStore()
-  const { data: session } = useSession()
+  const { setInputEmail } = useAuthStore();
+  const { data: session } = useSession();
 
   useEffect(() => {
-    if(session)
-        redirect("/chat")
-  }, [session])
+    if (session) redirect("/chat");
+  }, [session]);
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-        const res = await axiosInstance.post("/api/auth/inititate-signup", {
-            email
-        });
-
-        const data = await res.data;
-
-        showSuccessToast(data.msg)
-
-        setOtpSent(true);
+      const res = await axiosInstance.post("/api/auth/inititate-signup", { email });
+      showSuccessToast(res.data.msg);
+      setOtpSent(true);
     } catch (error) {
-        if (error instanceof AxiosError && error.response?.data?.msg) {
-            showErrorToast(error.response.data.msg as string);
-        } else {
-            showErrorToast("An unexpected error occurred.");
-        }
+      if (error instanceof AxiosError && error.response?.data?.msg) {
+        showErrorToast(error.response.data.msg as string);
+      } else {
+        showErrorToast("An unexpected error occurred.");
+      }
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -54,13 +46,9 @@ export default function VerifyEmailPage() {
     setIsLoading(true);
 
     try {
-      const res = await axiosInstance.post("/api/auth/verify-email", {
-        email,
-        otp
-      });
-      
+      const res = await axiosInstance.post("/api/auth/verify-email", { email, otp });
       showSuccessToast(res.data.msg);
-      setInputEmail(email)
+      setInputEmail(email);
       router.push(`/signup`);
     } catch (error) {
       if (error instanceof AxiosError && error.response?.data?.msg) {
@@ -74,18 +62,29 @@ export default function VerifyEmailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4">
-      <div className="bg-neutral-900 rounded-xl border border-neutral-800 shadow-xl p-8 w-full max-w-md">
+    <div className="min-h-screen bg-white dark:bg-neutral-950 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 p-8 w-full max-w-md">
+
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Verify Email</h1>
-          <p className="text-neutral-400">
-            {otpSent ? "Enter the OTP sent to your email" : "Verify your email to continue"}
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+            Verify Email
+          </h1>
+          <p className="text-neutral-600 dark:text-neutral-400">
+            {otpSent
+              ? "Enter the OTP sent to your email"
+              : "Verify your email to continue"}
           </p>
         </div>
 
-        <form onSubmit={otpSent ? handleVerifyOtp : handleSendOtp} className="space-y-6">
+        <form
+          onSubmit={otpSent ? handleVerifyOtp : handleSendOtp}
+          className="space-y-6"
+        >
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-neutral-300 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2"
+            >
               Email Address
             </label>
             <input
@@ -96,13 +95,16 @@ export default function VerifyEmailPage() {
               disabled={otpSent || isLoading}
               required
               placeholder="Enter your email"
-              className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-transparent transition-all duration-200 disabled:bg-neutral-800/50 disabled:cursor-not-allowed placeholder-neutral-500"
+              className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-neutral-600 focus:border-transparent transition-all duration-200 disabled:bg-neutral-100/50 dark:disabled:bg-neutral-800/50 disabled:cursor-not-allowed placeholder-neutral-500"
             />
           </div>
 
           {otpSent && (
             <div>
-              <label htmlFor="otp" className="block text-sm font-medium text-neutral-300 mb-2">
+              <label
+                htmlFor="otp"
+                className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-2"
+              >
                 OTP Code
               </label>
               <input
@@ -113,7 +115,7 @@ export default function VerifyEmailPage() {
                 disabled={isLoading}
                 required
                 placeholder="Enter 6-digit OTP"
-                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-transparent transition-all duration-200 disabled:bg-neutral-800/50 disabled:cursor-not-allowed placeholder-neutral-500"
+                className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-neutral-600 focus:border-transparent transition-all duration-200 disabled:bg-neutral-100/50 dark:disabled:bg-neutral-800/50 disabled:cursor-not-allowed placeholder-neutral-500"
               />
             </div>
           )}
@@ -121,13 +123,29 @@ export default function VerifyEmailPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-neutral-700 hover:bg-neutral-600 disabled:bg-neutral-800 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:ring-offset-2 focus:ring-offset-neutral-900 disabled:cursor-not-allowed"
+            className="w-full bg-neutral-200 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 disabled:bg-neutral-300 dark:disabled:bg-neutral-800 font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-neutral-600 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-900 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-neutral-900 dark:text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 {otpSent ? "Verifying..." : "Sending..."}
               </div>
@@ -140,15 +158,16 @@ export default function VerifyEmailPage() {
         </form>
 
         <div className="mt-8 text-center">
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
             Already have an account?{" "}
-            <Link href="/signin" className="font-medium hover:underline text-neutral-300 hover:text-white transition-colors duration-200">
+            <Link
+              href="/signin"
+              className="font-medium hover:underline text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white transition-colors duration-200"
+            >
               Sign in
             </Link>
           </p>
         </div>
-
-        
       </div>
     </div>
   );

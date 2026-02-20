@@ -115,8 +115,8 @@ export function ProjectInitializer() {
 
   if (!session) {
     return (
-      <div className="h-screen bg-[#080810] flex items-center justify-center">
-        <Loader2 className="size-10 animate-spin text-purple-400" />
+      <div className="h-screen bg-white dark:bg-[#080810] flex items-center justify-center">
+        <Loader2 className="size-10 sm:size-14 md:size-16 animate-spin text-purple-400" />
       </div>
     )
   }

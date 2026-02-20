@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useEditorStore } from "@/stores/editorStore/useEditorStore"
-import { Clock, AlertCircle, Loader2, Check, Copy } from 'lucide-react'
+import { AlertCircle, Loader2, Check, Copy } from 'lucide-react'
 import { BuildStepType, statusType } from "@/stores/editorStore/types"
 import { ImageModal } from "./image-modal"
 import { StatusPanelSkeletons } from "./status-pannel-skeletons"
@@ -76,11 +76,11 @@ export function StatusPanel() {
       case statusType.Completed:
         return <Check className="w-4 h-4 text-green-500 translate-y-1" />
       case statusType.InProgress:
-        return <Clock className="w-4 h-4 text-yellow-500 animate-spin" />
+        return <Loader2 className="w-4 h-4 text-yellow-500 animate-spin" />
       case statusType.Error:
         return <AlertCircle className="w-4 h-4 text-red-500" />
       default:
-        return <Clock className="w-4 h-4 text-gray-500" />
+        return <Loader2 className="w-4 h-4 text-gray-500" />
     }
   }
 
@@ -93,7 +93,7 @@ export function StatusPanel() {
   useEffect(() => {
     let intervalId: NodeJS.Timeout | undefined = undefined
 
-    if (isProcessing) {
+    if (isProcessing || isProcessingFollowups) {
       intervalId = setInterval(() => {
         setLoadingWordIndex((prevIndex) => (prevIndex + 1) % loadingWords.length)
       }, 2000) 
@@ -106,7 +106,7 @@ export function StatusPanel() {
         clearInterval(intervalId)
       }
     }
-  }, [isProcessing])
+  }, [isProcessing, isProcessingFollowups])
 
   if (!promptStepsMap || promptStepsMap.size === 0) {
     return <StatusPanelSkeletons />
@@ -160,7 +160,7 @@ export function StatusPanel() {
               </div>
               <button
                 onClick={() => handleCopy(prompt, promptIndex)}
-                className="p-1 text-neutral-700 hover:text-neutral-400 dark:hover:text-white dark:text-gray-400 transition-colors"
+                className="p-1 text-neutral-700 hover:text-neutral-400 dark:hover:text-white dark:text-neutral-500 transition-colors"
                 title={copiedPromptIndex === promptIndex ? "Copied" : "Copy prompt"}
                 aria-label="Copy prompt"
               >
@@ -188,14 +188,14 @@ export function StatusPanel() {
                           {step.title.startsWith("Create") ? (
                             <div className="space-x-1 flex flex-wrap items-center">
                               <span className="font-semibold text-black dark:text-white">Create</span>
-                              <span className="bg-neutral-200 dark:bg-neutral-800 p-2 py-1 rounded-md truncate max-w-full block" title={step.title.replace(/^Create\s*/, "").replace(/^React Component\s*/, "")}>
+                              <span className="bg-neutral-200 dark:bg-neutral-800 p-2 py-1 rounded-md truncate max-w-full block tooltip-button" title={step.title.replace(/^Create\s*/, "").replace(/^React Component\s*/, "")}>
                                 {step.title
                                   .replace(/^Create\s*/, "")                  
                                   .replace(/^React Component\s*/, "")}        
                               </span>
                             </div>
                           ) : (
-                            <div className="text-black dark:text-white truncate" title={step.title}>{step.title}</div>
+                            <button className="text-black dark:text-white truncate theme-tooltip-button" aria-label={step.title}>{step.title}</button>
                           )}
                         </div>
                       }
@@ -208,8 +208,8 @@ export function StatusPanel() {
           </div>
         ))}
 
-        {isProcessing && (
-          <div className="flex items-center gap-2 text-sm text-blue-400 mt-4 p-3 bg-blue-900/20 rounded-lg">
+        {(isProcessing || isProcessingFollowups) && (
+          <div className="flex items-center gap-2 text-sm text-purple-500 mt-4 p-3 bg-purple-900/20 rounded-lg">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span className="animate-pulse">{loadingWords[loadingWordIndex]}</span>
           </div>
@@ -230,8 +230,8 @@ export function StatusPanel() {
             limitReached: usageRemaining <= 0
           }}
           textareaHeight="1rem"
-          textareaMaxHeight="10rem"
-          textareaClassName="placeholder:text-sm text-[0.94rem]"
+          textareaMaxHeight="5rem"
+          textareaClassName="placeholder:text-sm text-[0.9rem]"
           maxImages={10}
           submitButtonSize={"4"}
           imageSelectorSize={"5"}

@@ -46,8 +46,8 @@ const ViewPlansPage = () => {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-black">
-        <Loader2 className="h-10 w-10 animate-spin text-purple-500" />
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+        <Loader2 className="size-10 sm:size-14 md:size-16 animate-spin text-purple-500" />
       </div>
     )
   }

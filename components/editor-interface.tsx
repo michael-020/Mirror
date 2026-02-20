@@ -76,7 +76,7 @@ export function EditorInterface({
   
   if(!session){
      return <div className="h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
-       <Loader2 className="size-14 animate-spin text-neutral-950 dark:text-neutral-200" />
+       <Loader2 className="size-10 sm:size-14 md:size-16 animate-spin text-purple-500" />
      </div>
    }
 
