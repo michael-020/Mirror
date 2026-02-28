@@ -1,64 +1,71 @@
-# Zap ✨
+# Zap ⚡
 
-"Zap" is a revolutionary minimal site builder that brings your development environment directly into the browser! 🚀 Craft beautiful websites with an integrated code editor, live preview, and AI assistance, all without any local setup. ✨
+Zap is an innovative, in-browser site builder designed to revolutionize how you create and develop websites. Say goodbye to complex local setups and hello to a full-fledged development environment right in your web browser! 🚀 Craft, code, and deploy your web projects with unparalleled ease and efficiency.
 
-## Key Features
+## ✨ Features
 
-*   **In-Browser Development Environment**: 🖥️ Spin up full coding projects directly in your browser using cutting-edge WebContainer technology – no local dependencies or installations required!
-*   **Intuitive Code Editor & Project Management**: ✍️ Edit, organize, and manage your files within a powerful, integrated editor. Start new projects or seamlessly resume existing ones, with your progress always saved.
-*   **Secure User Authentication**: 🔐 Log in effortlessly with Google OAuth. Manage your sessions and access personalized project spaces.
-*   **AI-Assisted Development**: 🤖 Boost your productivity with intelligent AI assistance. Generate code, get suggestions, and interact with your project through a built-in chat interface.
-*   **Cloud Asset Management**: ☁️ Easily upload and manage your site's images and media files with integrated Cloudinary support.
-*   **Live Preview Capability**: 👀 See your changes instantly with a real-time live preview of your website as you code.
+*   **In-Browser Development Environment** 💻
+    Spin up complete coding projects directly in your browser. Leveraging advanced WebContainer technology, Zap provides a sandboxed, fully functional development environment with an integrated code editor and comprehensive project management tools.
+*   **Real-time Live Preview** 👀
+    See your changes come to life instantly! As you code, Zap provides a dynamic, live preview of your website, allowing for immediate visualization and rapid iteration.
+*   **AI-Assisted Development** 🤖
+    Boost your productivity with integrated AI capabilities. Benefit from intelligent code generation, smart suggestions, and a built-in chat interface for interactive AI assistance.
+*   **Secure User Authentication & Project Management** 🔒
+    Log in effortlessly using Google OAuth (powered by NextAuth.js). Manage your sessions and access personalized project spaces where all your hard work is persistently saved and securely stored.
+*   **Cloud Asset Management** ☁️
+    Integrate seamlessly with Cloudinary to easily upload, manage, and host all your images and media assets directly in the cloud, streamlining your content workflow.
+*   **Integrated Payment Processing** 💰
+    Zap includes a secure payment system, ready to support monetization strategies for premium features, subscriptions, project exports, or other value-added services, leveraging JWTs for secure transactions.
 
-## Technologies Used
-
-### Backend / Fullstack
-
-*   [Next.js](https://nextjs.org/) (App Router)
-*   [NextAuth.js](https://next-auth.js.org/) (Google OAuth)
-*   [WebContainer](https://webcontainers.io/) (for in-browser sandboxing)
-*   [Cloudinary](https://cloudinary.com/) (Asset Management)
+## 🛠️ Technologies Used
 
 ### Frontend
+*   **Next.js**: A React framework for building full-stack web applications.
+*   **React**: A JavaScript library for building user interfaces.
 
-*   [React](https://react.dev/)
-*   [Tailwind CSS](https://tailwindcss.com/)
-*   [react-hot-toast](https://react-hot-toast.com/) (Notifications)
+### Backend
+*   **Next.js**: For API routes and server-side logic.
+*   **NextAuth.js**: Secure authentication for Next.js applications, supporting Google OAuth.
+*   **WebContainer**: Powers the in-browser development environment.
+*   **Cloudinary**: Cloud-based media management platform.
+*   **Razorpay**: Payment gateway integration for secure transactions.
+*   **JSON Web Tokens (JWT)**: For secure payment initiation and authorization.
 
-## Getting Started
+## 🚀 Getting Started
 
-Follow these steps to get "Zap" up and running on your local machine for development and testing purposes.
+Follow these steps to get Zap up and running on your local machine for development and testing purposes.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/Zap.git
-    cd Zap
+    git clone [repository_url]
+    cd zap
     ```
+    *(Replace `[repository_url]` with the actual URL of the Zap repository)*
 
 2.  **Install dependencies:**
     ```bash
     npm install
-    # or yarn install
-    # or pnpm install
+    # or
+    yarn install
     ```
 
-3.  **Configure Environment Variables:**
-    Create a `.env.local` file in the root of your project. You will need to define the following environment variables (refer to the provided `.env.example` for structure and guidance):
+3.  **Set up environment variables:**
+    Create a `.env.local` file in the root of the project and add the following environment variables. Obtain these from their respective service providers:
     *   `NEXTAUTH_SECRET`
     *   `GOOGLE_CLIENT_ID`
     *   `GOOGLE_CLIENT_SECRET`
     *   `CLOUDINARY_CLOUD_NAME`
     *   `CLOUDINARY_API_KEY`
     *   `CLOUDINARY_API_SECRET`
-
-    Obtain your Google OAuth credentials from the Google Cloud Console and your Cloudinary credentials from your Cloudinary dashboard. `NEXTAUTH_SECRET` can be a randomly generated string.
+    *   `PAYMENT_JWT_SECRET`
+    *   `RAZORPAY_WEBHOOK_SECRET`
 
 4.  **Run the development server:**
     ```bash
     npm run dev
-    # or yarn dev
-    # or pnpm dev
+    # or
+    yarn dev
     ```
 
-    Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+5.  **Access Zap in your browser:**
+    Open [http://localhost:3000](http://localhost:3000) to start building amazing websites!
