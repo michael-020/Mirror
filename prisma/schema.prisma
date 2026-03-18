@@ -15,6 +15,7 @@ model User {
   provider      AUTHOPTIONS @default(CREDENTIALS)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @default(now())
+  plan          UserTier    @default(FREE)
   isPremium     Boolean     @default(false)
   Project       Project[]
   Usage         Usage[]
@@ -95,4 +96,9 @@ enum PaymentStatus {
 enum AUTHOPTIONS {
   GOOGLE
   CREDENTIALS
+}
+
+enum UserTier {
+  FREE
+  PRO
 }
