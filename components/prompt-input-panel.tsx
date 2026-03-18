@@ -10,6 +10,7 @@ import { showErrorToast } from "@/lib/toast"
 import { useAuthStore } from "@/stores/authStore/useAuthStore"
 import { UsageSkeleton } from "./usage-skeleton"
 import { BrowserSupportModal, isSupportedEnvironment } from "./browser-support-modal"
+import { useEditorStore } from "@/stores/editorStore/useEditorStore"
 
 async function convertToWebP(file: File, quality: number = 0.8): Promise<File> {
   return new Promise((resolve, reject) => {
@@ -112,6 +113,7 @@ export function PromptInputPanel({
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(!isPremium)
   const [showBrowserModal, setShowBrowserModal] = useState(false)
   const { isFetchingUsage } = useAuthStore()
+  const { isProjectBuilding } = useEditorStore()
   
   const CHAR_LIMIT = 500;
 
@@ -174,6 +176,8 @@ export function PromptInputPanel({
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
+  console.log("is premium: ", isPremium)
   
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -274,7 +278,7 @@ export function PromptInputPanel({
     isSubmitting || 
     isProcessingImages || 
     (!description.trim() && imagePreviews.length === 0) ||
-    (usageInfo?.limitReached ?? false);
+    (usageInfo?.limitReached ?? false) || isProjectBuilding;
 
   return (
     <>

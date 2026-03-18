@@ -10,6 +10,7 @@ import { StatusPanelSkeletons } from "./status-pannel-skeletons"
 import { PromptInputPanel } from "./prompt-input-panel"
 import { useSession } from "next-auth/react"
 import { useAuthStore } from "@/stores/authStore/useAuthStore"
+import { UserTier } from "@prisma/client"
 
 const loadingWords = [
   "Thinking...",
@@ -30,16 +31,17 @@ export function StatusPanel() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalImageSrc, setModalImageSrc] = useState("")
   const session = useSession()
-  const { currentUsage, isPremium, fetchUsage } = useAuthStore()
+  const { currentUsage, fetchUsage, plan } = useAuthStore()
   const [loadingWordIndex, setLoadingWordIndex] = useState(0)
-  const maxUsage = isPremium ? Infinity : 5
+  const isPro = plan === UserTier.PRO
+  const maxUsage = isPro ? Infinity : 5
 
   useEffect(() => {
-    if (session && !isPremium) {
+    if (session && !isPro) {
       fetchUsage()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, isPremium])
+  }, [session, isPro])
 
   const openImageModal = (imageSrc: string) => {
     setModalImageSrc(imageSrc)
@@ -218,7 +220,7 @@ export function StatusPanel() {
 
       <div className="border-t border-neutral-200 dark:border-neutral-800 p-2 bg-neutral-50 dark:bg-neutral-950">
         <PromptInputPanel
-          isPremium={session.data?.user.isPremium as boolean}
+          isPremium={isPro}
           description={prompt}
           setDescription={setPrompt}
           onSubmit={handleSubmit}

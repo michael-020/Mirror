@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { UserTier } from "@prisma/client";
 
 const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_PAYMENT_API_URL!;
 
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest){
             }),
             prisma.user.update({
                 where: { id: payload.userId },
-                data: { isPremium: true },
+                data: { plan: UserTier.PRO },
             }),
         ]);
 

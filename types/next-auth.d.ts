@@ -9,6 +9,7 @@ declare module "next-auth" {
       name?: string | null;
       image?: string | null;
       isPremium: boolean;
+      plan: UserTier;
       downloadCount: number;
     }
   }
@@ -17,6 +18,7 @@ declare module "next-auth" {
     id: string;
     email: string;
     isPremium: boolean;
+    plan: UserTier;
     downloadCount: number;
   }
 }
@@ -25,6 +27,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     isPremium: boolean;   
+    plan: UserTier;
     downloadCount: number;
   }
 }

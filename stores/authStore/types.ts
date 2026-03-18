@@ -1,9 +1,11 @@
+import { UserTier } from "@prisma/client";
+
 export interface authState {
     inputEmail: string;
     savedPrompt: string;
     savedImages: File[];
     currentUsage: number;
-    isPremium: boolean;
+    plan: UserTier
     isFetchingUsage: boolean
 }
 
@@ -15,6 +17,6 @@ export interface authAction {
     setUsage: (usage: number) => void;
     incrementUsage: () => void;
     resetUsage: () => void;
-    setPremiumStatus: (status: boolean) => void;
+    setPlan: (plan: UserTier) => void;
     fetchUsage: () => void;
 }

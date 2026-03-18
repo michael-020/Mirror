@@ -12,6 +12,7 @@ import { axiosInstance } from "@/lib/axios"
 import { PromptInputPanel } from "./prompt-input-panel"
 import { showErrorToast } from "@/lib/toast"
 import { motion } from "framer-motion"
+import { UserTier } from "@prisma/client"
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -28,7 +29,7 @@ export function ProjectInitializer() {
     savedImages,
     clearSavedData,
     currentUsage,
-    isPremium,
+    plan,
     setUsage,
   } = useAuthStore()
 
@@ -36,17 +37,20 @@ export function ProjectInitializer() {
   const [isOpen, setIsOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [hasInitialized, setHasInitialized] = useState(false)
+  const isPro = plan === UserTier.PRO
+
+  console.log("is pro: ", isPro)
 
   const { createProject, processPrompt, isInitialising, isCreatingProject } =
     useEditorStore()
 
   const { data: session, status } = useSession()
 
-  const maxUsage = isPremium ? Infinity : 5
+  const maxUsage = plan === UserTier.PRO ? Infinity : 5
   const usageRemaining = maxUsage - currentUsage
 
   useEffect(() => {
-    if (session && !isPremium) {
+    if (session && plan === UserTier.FREE) {
       const fetchUsage = async () => {
         try {
           const res = await axiosInstance.get("/api/usage")
@@ -57,7 +61,7 @@ export function ProjectInitializer() {
       }
       fetchUsage()
     }
-  }, [session, isPremium, setUsage])
+  }, [session, plan, setUsage])
 
   useEffect(() => {
     if (!session || hasInitialized) return
@@ -191,7 +195,7 @@ export function ProjectInitializer() {
               <div className="relative md:block">
 
                   <PromptInputPanel
-                    isPremium={session.user.isPremium}
+                    isPremium={isPro}
                     description={description}
                     setDescription={setDescription}
                     onSubmit={handleSubmit}

@@ -6,6 +6,7 @@ import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useAuthStore } from '@/stores/authStore/useAuthStore'
+import { UserTier } from '@prisma/client'
 
 export interface Chat {
   id: string
@@ -35,13 +36,13 @@ export default function RightSidebar({
   const router = useRouter()
 
   const { data: session, status } = useSession()
-  const { isPremium, setPremiumStatus } = useAuthStore()
+  const { plan, setPlan } = useAuthStore()
 
   useEffect(() => {
     if (status === 'authenticated') {
-      setPremiumStatus(!!session?.user?.isPremium)
+      setPlan(session.user.plan)
     }
-  }, [status, session, setPremiumStatus])
+  }, [status, session, setPlan, plan])
 
   useEffect(() => {
     if (!isOpen || status !== 'authenticated') {
@@ -145,7 +146,7 @@ export default function RightSidebar({
         )}
       </div>
 
-      {!isPremium && (
+      {plan === UserTier.FREE && (
         <div className="absolute bottom-4 w-full px-4">
           <button
             onClick={() => {

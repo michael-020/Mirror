@@ -4,6 +4,7 @@ import { PanelRight } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import UserDropdown from './user-dropdown' 
+import { UserTier } from '@prisma/client'
 
 interface NavbarProps {
   onPanelToggle?: () => void
@@ -55,7 +56,7 @@ export default function Navbar({
         <div className="flex gap-3 items-center relative">
           {/* ThemeToggle has been removed from here */}
 
-          {session?.user.isPremium && (
+          {session?.user.plan === UserTier.PRO && (
             <div className="text-xs text-neutral-200 bg-neutral-900 px-3 py-2 rounded-md cursor-default select-none">
               Pro
             </div>

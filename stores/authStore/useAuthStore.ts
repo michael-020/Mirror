@@ -1,13 +1,14 @@
 import { create } from "zustand"
 import { authAction, authState } from "./types"
 import { axiosInstance } from "@/lib/axios"
+import { UserTier } from "@prisma/client"
 
 export const useAuthStore = create<authState & authAction>((set, get) => ({
     inputEmail: "",
     savedPrompt: "",
     savedImages: [],
     currentUsage: 0,   
-    isPremium: false, 
+    plan: UserTier.FREE,
     isFetchingUsage: false,
 
     setInputEmail: (email: string) => {
@@ -40,8 +41,8 @@ export const useAuthStore = create<authState & authAction>((set, get) => ({
         set({ currentUsage: 0 })
     },
 
-    setPremiumStatus: (status: boolean) => {
-        set({ isPremium: status })
+    setPlan: (plan: UserTier) => {
+        set({ plan })
     },
 
     fetchUsage: async () => {

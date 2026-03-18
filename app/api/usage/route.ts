@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/server/authOptions";
 import { prisma } from "@/lib/prisma";
+import { UserTier } from "@prisma/client";
 
 export async function GET() {
     try {
@@ -58,9 +59,9 @@ export async function PUT() {
             );
         }
 
-        if(session.user.isPremium){
+        if(session.user.plan === UserTier.PRO){
             return NextResponse.json(
-                { msg: "Premium user"}
+                { msg: "Pro user"}
             )
         }
 

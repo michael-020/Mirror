@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/server/authOptions";
+import { UserTier } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
 
       const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { isPremium: true },
+        select: { plan: true },
       });
 
       if (!user) {
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
         where: { userId: session.user.id },
       });
 
-      if (!user.isPremium && projectCount >= 5) {
+      if (user.plan === UserTier.FREE && projectCount >= 5) {
         return NextResponse.json(
           { msg: "You've reached the limit of 5 projects for your account.\nUpgrade to Pro to create more projects." },
           { status: 403 }

@@ -6,6 +6,7 @@ import { z } from "zod";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/server/authOptions";
 import { prisma } from "@/lib/prisma";
+import { UserTier } from "@prisma/client";
 
 const chatStreamSchema = z.object({
   messages: z.array(
@@ -125,7 +126,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!session.user.isPremium) {
+    if (session.user.plan === UserTier.FREE) {
       const usageRecord = await prisma.usage.findFirst({
         where: {
           userId: session.user.id,
@@ -226,7 +227,7 @@ export async function POST(req: NextRequest) {
 
     const formattedMessages = await formatMessagesWithImages(messages, prompt, images);
 
-    const model = session.user.isPremium 
+    const model = session.user.plan === UserTier.PRO 
       ? (process.env.PRO_MODEL as string) 
       : (process.env.FREE_MODEL as string);
     

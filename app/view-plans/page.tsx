@@ -3,6 +3,7 @@
 import Navbar from "@/components/navbar"
 import RightSidebar from "@/components/sidebar"
 import { useAuthStore } from "@/stores/authStore/useAuthStore"
+import { UserTier } from "@prisma/client"
 import { Check, X, Loader2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -10,17 +11,19 @@ import { useState, useEffect } from "react"
 
 const ViewPlansPage = () => {
   const router = useRouter()
-  const { isPremium, setPremiumStatus } = useAuthStore()
+  const { plan, setPlan } = useAuthStore()
   const { data: session, status } = useSession()
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
+  const isPro = plan === UserTier.PRO
+
   useEffect(() => {
     if (status === "authenticated") {
-      setPremiumStatus(!!session?.user?.isPremium)
+      setPlan(session.user.plan)
     }
-  }, [status, session, setPremiumStatus])
+  }, [status, session, setPlan])
 
   useEffect(() => {
     const threshold = 25
@@ -65,7 +68,7 @@ const ViewPlansPage = () => {
         <div className="w-full max-w-6xl">
           <div className="text-center mb-5 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white md-2 sm:mb-4">
-              {isPremium ? "You're on the Pro plan" : "Choose Your Plan"}
+              {isPro ? "You're on the Pro plan" : "Choose Your Plan"}
             </h1>
             <p className="text-neutral-600 dark:text-neutral-400 text-[0.88rem] sm:text-lg">
               Design, generate, and ship websites faster with Zap.
@@ -91,11 +94,11 @@ const ViewPlansPage = () => {
                   <Feature text="5 downloads only" disabled />
                 </div>
 
-                {!isPremium && <button
-                  disabled={!isPremium}
+                {!isPro && <button
+                  disabled={!isPro}
                   onClick={() => router.push("/chat")}
                   className={`mt-10 w-full py-3.5 rounded-lg font-semibold transition ${
-                    !isPremium
+                    !isPro
                       ? "bg-neutral-900 text-white hover:bg-neutral-700"
                       : "bg-neutral-300/50 text-neutral-100 cursor-not-allowed"
                   }`}
@@ -107,7 +110,7 @@ const ViewPlansPage = () => {
 
             <div
               className={`p-8 rounded-2xl border-2 relative ${
-                isPremium
+                isPro
                   ? "border-purple-500/60 bg-gradient-to-br from-purple-50/50 to-white dark:from-purple-900/20 dark:to-neutral-900/90 shadow-xl shadow-purple-500/20"
                   : "border-purple-500/50 bg-gradient-to-br from-purple-50/30 to-white dark:from-purple-950/20 dark:to-neutral-900/60"
               } transition-all duration-300`}
@@ -115,7 +118,7 @@ const ViewPlansPage = () => {
               
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <span className="px-4 py-1.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-semibold rounded-full shadow-lg">
-                  {isPremium ? "CURRENT PLAN" : "RECOMMENDED"}
+                  {isPro ? "CURRENT PLAN" : "RECOMMENDED"}
                 </span>
               </div>
 
@@ -131,7 +134,7 @@ const ViewPlansPage = () => {
                   <Feature text="Unlimited projects & downloads" />
                 </div>
 
-                {!isPremium && (
+                {!isPro && (
                   <>
                     <label className="mt-8 mb-4 flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400 cursor-pointer">
                       <input

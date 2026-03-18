@@ -269,6 +269,7 @@ export default function Landing() {
                   textareaMaxHeight="12rem"
                   maxImages={10}
                   showSupportModal={false}
+                  // textareaClassName="text-lg"
                 />
               </div>
             </div>

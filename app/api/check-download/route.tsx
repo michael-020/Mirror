@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma"; 
 import { authOptions } from "@/lib/server/authOptions";
+import { UserTier } from "@prisma/client";
 
 const DOWNLOAD_LIMIT = 5;
 
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    if (user.isPremium) {
+    if (user.plan === UserTier.PRO) {
       return NextResponse.json({
         allowed: true,
         remaining: "Unlimited",

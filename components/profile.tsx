@@ -11,6 +11,7 @@ import { useEditorStore } from "@/stores/editorStore/useEditorStore"
 import { Project } from "./project-card"
 import { useSession } from "next-auth/react"
 import { DownloadIcon } from "lucide-react"
+import { UserTier } from "@prisma/client"
 
 export function Profile() {
   const [projects, setProjects] = useState<Project[] | null>(null)
@@ -69,7 +70,7 @@ export function Profile() {
 
   const user = session?.data?.user
   const downloadCount = user?.downloadCount ?? 0
-  const isPremium = user?.isPremium ?? false
+  const isPro = user?.plan === UserTier.PRO
   const downloadLimit = 5
   const initials = user?.email?.slice(0, 1).toUpperCase() ?? "?"
 
@@ -114,19 +115,19 @@ export function Profile() {
                     {user.email}
                 </p>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    {isPremium ? "Pro plan" : "Free plan"}
+                    {isPro ? "Pro plan" : "Free plan"}
                 </p>
                 </div>
 
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
                 <DownloadIcon className="size-3.5 text-neutral-500 dark:text-neutral-400 shrink-0" />
                 <span className="text-sm text-neutral-600 dark:text-neutral-400">
-                    {isPremium
+                    {isPro
                     ? `${downloadCount} downloads`
                     : `${downloadCount}/${downloadLimit} downloads`}
                 </span>
 
-                {!isPremium && downloadCount >= downloadLimit && (
+                {!isPro && downloadCount >= downloadLimit && (
                     <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-700">
                     Limit reached
                     </span>

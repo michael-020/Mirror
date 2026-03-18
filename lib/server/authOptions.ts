@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google"
 import bcrypt from "bcrypt"
 import { AuthOptions } from "next-auth";
 import { AUTHOPTIONS } from "@/prisma/app/generated/prisma";
+import { UserTier } from "@prisma/client";
 
 export const authOptions: AuthOptions = ({
   providers: [
@@ -30,7 +31,7 @@ export const authOptions: AuthOptions = ({
         if(!checkPassword)
           return null
 
-        return { id: user.id, email: user.email, isPremium: user.isPremium, downloadCount: user.downloadCount }
+        return { id: user.id, email: user.email, plan: user.plan, isPremium: user.isPremium, downloadCount: user.downloadCount }
       }
     }),
     GoogleProvider({
@@ -43,14 +44,17 @@ export const authOptions: AuthOptions = ({
       if (session?.user && token.id) {
         session.user.id = token.id as string 
         session.user.isPremium = token.isPremium as boolean
+        session.user.plan = token.plan as UserTier
         session.user.downloadCount = token.downloadCount as number
       }
+
       return session
     },
     jwt: async ({trigger, token, user, account, session}) => {
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.plan = user.plan
         token.isPremium = user.isPremium; 
         token.downloadCount = user.downloadCount
       }
@@ -58,10 +62,11 @@ export const authOptions: AuthOptions = ({
       if (trigger === "update" && session) {
 
         const dbUser = await prisma.user.findUnique({
-          where: { id: session.user.id },
+          where: { id: token.id},
         });
         
         if (dbUser) {
+          token.plan = dbUser.plan
           token.isPremium = dbUser.isPremium;
           token.downloadCount = dbUser.downloadCount;
 
@@ -73,10 +78,11 @@ export const authOptions: AuthOptions = ({
         try {
           const dbUser = await prisma.user.findUnique({
             where: { email: token.email },
-            select: { id: true, isPremium: true, downloadCount: true }
+            select: { id: true, plan: true, isPremium: true, downloadCount: true }
           });
           if (dbUser) {
             token.id = dbUser.id;
+            token.plan = dbUser.plan;
             token.isPremium = dbUser.isPremium;
             token.downloadCount = dbUser.downloadCount
           }

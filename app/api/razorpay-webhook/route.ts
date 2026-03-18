@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
 import crypto from "crypto"
+import { UserTier } from "@prisma/client"
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET!
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
     }),
     prisma.user.update({
       where: { id: payment.userId },
-      data: { isPremium: true },
+      data: { plan: UserTier.PRO },
     }),
   ])
 
