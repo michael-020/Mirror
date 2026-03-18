@@ -39,7 +39,6 @@ export function ProjectInitializer() {
   const [hasInitialized, setHasInitialized] = useState(false)
   const isPro = plan === UserTier.PRO
 
-  console.log("is pro: ", isPro)
 
   const { createProject, processPrompt, isInitialising, isCreatingProject } =
     useEditorStore()

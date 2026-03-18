@@ -28,7 +28,6 @@ export const useAuthStore = create<authState & authAction>((set, get) => ({
     },
 
     setUsage: (usage: number) => {
-        console.log("updating usage: ", usage)
         set({ currentUsage: usage })
     },
 

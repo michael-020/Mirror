@@ -176,8 +176,6 @@ export function PromptInputPanel({
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
-
-  console.log("is premium: ", isPremium)
   
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();

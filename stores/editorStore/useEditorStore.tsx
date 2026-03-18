@@ -38,7 +38,6 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       return;
     else 
       set({ webcontainer: instance })
-    console.log("webcontainer setup")
   },
 
   setMessages: (messages) => {
@@ -203,7 +202,6 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       }),
 
     setShellCommand: (command: string) =>{
-      console.log("command added: ", command)
       set((state) => ({
         shellCommands: [...state.shellCommands, command],
       }))
@@ -240,7 +238,6 @@ export const useEditorStore = create<StoreState>((set, get) => ({
             devProc.output.pipeTo(new WritableStream({ write() {} }))
 
             webcontainer.on("server-ready", (port, url) => {
-              console.log("Dev server ready at:", url)
               setPreviewUrl(url)
               set({ isProjectBuilding: false })
               set({ isPreviewReady: true })
@@ -264,11 +261,9 @@ export const useEditorStore = create<StoreState>((set, get) => ({
     
     executeSteps: async (steps: BuildStep[]) => {
       const { setStepStatus, addFile, addFileItem } = get()
-      console.log("executing steps")
       for (const step of steps) {
         try {
           if (step.title === "Project Files") {
-            console.log("Skipping Project Files step:", step)
             continue
           }
 
@@ -301,7 +296,6 @@ export const useEditorStore = create<StoreState>((set, get) => ({
 
             case BuildStepType.RunScript: {
               if (step.description) {
-                console.log("Executing command:", step.description)
                 get().setShellCommand(step.description)
                 await get().handleShellCommand(step.description)
               }
@@ -414,7 +408,6 @@ export const useEditorStore = create<StoreState>((set, get) => ({
         try {
           const res = await axiosInstance.post("/api/get-images", { url })
           images?.push(res.data.images)
-          console.log("images: ", images)
         } catch (error) {
           console.error("Error while getting images: ", error)
           hasErrorOccured = true
@@ -1048,7 +1041,6 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       // Reset store state
       clearBuildSteps()
       resetUserEditedFiles()
-      console.log("processing chat data")
 
       const allSteps: BuildStep[] = []
       const allMessages: string[] = []
@@ -1153,11 +1145,9 @@ export const useEditorStore = create<StoreState>((set, get) => ({
       }
 
       set({ isInitialisingWebContainer: true })
-      console.log("initialising web container")
       try {
         const webContainerInstance = await WebContainer.boot();
         setWebcontainer(webContainerInstance);
-        console.log("web container initialised")
       } catch (error) {
         console.error("Error while initialisint web container: ", error)
       } finally {
