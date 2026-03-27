@@ -87,7 +87,7 @@ export default function NotFound() {
               custom={0.3}
               className="text-neutral-600 dark:text-neutral-400 text-lg mb-8 max-w-xl mx-auto leading-relaxed"
             >
-              Oops! The page you're looking for seems to have vanished into the digital void.
+              Oops! The page you&apos;re looking for seems to have vanished into the digital void.
             </motion.p>
 
             {/* Action Buttons */}
