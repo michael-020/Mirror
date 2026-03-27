@@ -23,7 +23,7 @@ export function CodeEditorTabs({
   isFullscreen,
   setIsFullscreen,
 }: CodeEditorTabsProps) {
-  const { fileItems, isProjectBuilding, isProcessing, isProcessingFollowups } = useEditorStore();
+  const { fileItems, isProjectBuilding, isProcessing, isProcessingFollowups, isInitialising } = useEditorStore();
   const [isDownloading, setIsDownloading] = useState(false);
   const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
   const { data: session, update } = useSession()
@@ -91,7 +91,7 @@ export function CodeEditorTabs({
             // disabled={isInstalling}
             aria-label="Preview"
             onClick={() => {
-              if(isProjectBuilding || isProcessingFollowups){
+              if(isProjectBuilding || isProcessingFollowups || isInitialising || isProcessing){
                 showLoaderToast("Please wait, \nyour project is being built...")
                 return
               }
