@@ -47,7 +47,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       props.onKeyDown?.(e)
     }
 
-    const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const handleInput = (e: React.InputEvent<HTMLTextAreaElement>) => {
       adjustHeight()
       props.onInput?.(e)
     }
