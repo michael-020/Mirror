@@ -7,5 +7,5 @@ export const LoginButton = () => {
 }
 
 export const LogoutButton = () => {
-  return <button className='bg-custom-wine-500 text-white hover:bg-custom-wine-600 rounded-md p-2 mr-4'  onClick={() => signOut()}>Sign Out</button>
+  return <button className='bg-custom-wine-500 text-white hover:bg-custom-wine-600 rounded-md p-2 mr-4'  onClick={() => signOut({ callbackUrl: '/signin' })}>Sign Out</button>
 }
