@@ -4,7 +4,7 @@ import { basePrompt as reactBasePrompt } from "@/defaults/react";
 import { z } from "zod";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/server/authOptions";
-import { openai } from "@/lib/server/openai";
+import { getOpenAIClient } from "@/lib/server/openai";
 
 const templateSchema = z.object({
   prompt: 
@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
         }
         const prompt = validatedSchema.data.prompt
 
-        const response = await openai.chat.completions.create({
+        const client = getOpenAIClient()
+        const response = await client.chat.completions.create({
             model: process.env.BASE_MODEL!,
             messages: [
                 {

@@ -1,5 +1,5 @@
 import { getSystemPrompt } from "@/lib/prompts";
-import { openai } from "@/lib/server/openai";
+import { getOpenAIClient } from "@/lib/server/openai";
 import { NextRequest, NextResponse } from "next/server";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { z } from "zod";
@@ -230,8 +230,8 @@ export async function POST(req: NextRequest) {
     const model = session.user.plan === UserTier.PRO 
       ? (process.env.PRO_MODEL as string) 
       : (process.env.FREE_MODEL as string);
-    
-    const completion = await openai.chat.completions.create({
+    const client = getOpenAIClient()
+    const completion = await client.chat.completions.create({
       model,
       messages: formattedMessages,
       stream: true,
