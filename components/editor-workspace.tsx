@@ -29,7 +29,7 @@ export function EditorWorkspace({ isFullscreen, setIsFullscreen }: { isFullscree
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3rem)]">
+    <div className="flex flex-col h-[calc(100vh-4rem)]">
       <CodeEditorTabs isFullscreen={isFullscreen} setIsFullscreen={setIsFullscreen} activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="flex-1 overflow-hidden">
         {activeTab === "code" ? (
