@@ -12,8 +12,6 @@ function getNextKey() {
 export function getOpenAIClient() {
   const key = getNextKey();
 
-  console.log("Using API Key:", key?.slice(0, 10) + "...");
-
   return new OpenAI({
     apiKey: key,
     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
