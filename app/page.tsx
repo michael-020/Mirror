@@ -9,42 +9,86 @@ import { PromptInputPanel } from "@/components/prompt-input-panel";
 import { showErrorToast } from "@/lib/toast";
 import { motion, cubicBezier } from "framer-motion";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: cubicBezier(0.22, 1, 0.36, 1), delay },
-  }),
-};
+const ease = cubicBezier(0.16, 1, 0.3, 1);
 
 const FEATURES = [
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
       </svg>
     ),
-    label: "Instant generation",
-    desc: "From idea to live website in seconds",
+    title: "In-Browser Dev Environment",
+    description: "Full coding environment powered by WebContainer technology — no local setup, no installs. Code editor and project management built right in.",
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
       </svg>
     ),
-    label: "No code needed",
-    desc: "Just describe what you want",
+    title: "Real-time Live Preview",
+    description: "See every change reflected instantly as you build. Tight feedback loops mean faster iteration and fewer surprises.",
   },
   {
     icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
       </svg>
     ),
-    label: "Beautiful designs",
-    desc: "Stunning layouts crafted automatically",
+    title: "AI-Assisted Development",
+    description: "Intelligent code generation, smart suggestions, and a built-in chat interface. Describe what you need — Zap builds it.",
+  },
+  {
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+      </svg>
+    ),
+    title: "Cloud Asset Management",
+    description: "Upload, manage, and host images and media assets via Cloudinary. Your content lives in the cloud, always available.",
+  },
+  {
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    ),
+    title: "Auth & Project Management",
+    description: "Sign in with Google via NextAuth.js. Your projects are saved and secured — pick up right where you left off.",
+  },
+  {
+    icon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+      </svg>
+    ),
+    title: "Integrated Payments",
+    description: "Built-in Razorpay payment processing with JWT-secured transactions, ready for premium features and subscriptions.",
+  },
+];
+
+const STEPS = [
+  {
+    number: "01",
+    title: "Describe your site",
+    body: "Type what you want in plain English — a portfolio, a landing page, a dashboard. The more detail, the better.",
+  },
+  {
+    number: "02",
+    title: "Zap builds it",
+    body: "Our AI generates a fully structured, styled website in seconds using an in-browser WebContainer environment.",
+  },
+  {
+    number: "03",
+    title: "Refine with chat",
+    body: "Not quite right? Chat with Zap to tweak layouts, swap colors, add sections — no code required.",
+  },
+  {
+    number: "04",
+    title: "Ship it",
+    body: "Export your project or deploy directly. Your site is ready for the world.",
   },
 ];
 
@@ -72,118 +116,109 @@ export default function Landing() {
 
   return (
     <>
-      <main className="h-screen overflow-y-auto custom-scrollbar bg-white dark:bg-[#080810] flex flex-col relative">
-        {/* Background effects */}
+      <main
+        className="bg-[#06060f] text-white flex flex-col relative overflow-auto custom-scrollbar"
+        style={{ fontFamily: "'DM Sans', sans-serif" }}
+      >
+        {/* ── Global ambient background ── */}
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          {/* Primary glow */}
-          <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-gradient-to-b from-purple-600/20 via-purple-800/10 to-transparent rounded-full blur-[120px]" />
-          {/* Secondary accent */}
-          <div className="absolute top-[30%] left-[10%] w-[400px] h-[400px] bg-purple-400 dark:bg-purple-700/8 rounded-full blur-[100px]" />
-          <div className="absolute top-[20%] right-[5%] w-[350px] h-[350px] bg-purple-300 dark:bg-purple-500/8 rounded-full blur-[100px]" />
-          {/* Grid pattern */}
+          <div className="absolute top-[-15%] left-1/2 -translate-x-1/2 w-[800px] h-[560px] bg-purple-700/18 rounded-full blur-[140px]" />
+          <div className="absolute top-[30%] left-[-8%] w-[420px] h-[420px] bg-purple-900/12 rounded-full blur-[110px]" />
+          <div className="absolute top-[20%] right-[-8%] w-[360px] h-[360px] bg-violet-800/10 rounded-full blur-[110px]" />
           <div
-            className="absolute inset-0 opacity-[0.03]"
+            className="absolute inset-0 opacity-[0.035]"
             style={{
-              backgroundImage: `linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)`,
-              backgroundSize: "60px 60px",
+              backgroundImage: `radial-gradient(circle, rgba(139,92,246,1) 1px, transparent 1px)`,
+              backgroundSize: "32px 32px",
             }}
           />
-          {/* Radial fade over grid */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,transparent_40%,#fafafa_100%)] dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,transparent_40%,#080810_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_50%_0%,transparent_25%,#06060f_85%)]" />
         </div>
 
-        {/* Navbar */}
-        <nav className="fixed top-0 left-0 right-0 z-50">
-          <div className="mx-4 mt-4">
-            <motion.div
-              initial={{ opacity: 0, y: -16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="max-w-5xl mx-auto backdrop-blur-2xl bg-white/50 border-neutral-200 dark:bg-white/[0.04] border dark:border-white/[0.08] rounded-2xl px-5"
-            >
-              <div className="flex items-center justify-between h-14">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-400 to-purple-700 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <span className="text-base font-bold text-black dark:text-white tracking-tight">Zap</span>
+        {/* ══════════════════════════════════════════
+            NAVBAR
+        ══════════════════════════════════════════ */}
+        <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.07] bg-[#06060f]/80 backdrop-blur-xl">
+          <div className="max-w-6xl mx-auto px-5 flex items-center justify-between h-14">
+            <div className="text-neutral-900 dark:text-white font-bold font-stretch-extra-expanded text-xl tracking-wide select-none">
+              <div className='flex items-center justify-center gap-2'>
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-400 to-purple-700 flex items-center justify-center">
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => router.push("/signin")}
-                    className="text-sm font-medium text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors px-3 py-1.5"
-                  >
-                    Sign in
-                  </button>
-                  <button
-                    onClick={() => router.push("/signup")}
-                    className="px-4 py-1.5 text-sm font-semibold rounded-xl bg-black text-neutral-100 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100 transition-all shadow-lg shadow-white/10"
-                  >
-                    Get started
-                  </button>
-                </div>
+                Zap
               </div>
-            </motion.div>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => router.push("/signin")}
+                className="text-[13px] font-medium text-neutral-400 hover:text-white transition-colors px-3.5 py-2 rounded-lg hover:bg-white/[0.06]"
+              >
+                Sign in
+              </button>
+              <button
+                onClick={() => router.push("/signup")}
+                className="text-[13px] font-semibold px-4 py-2 rounded-lg bg-white text-neutral-900 hover:bg-neutral-100 transition-all"
+              >
+                Get started
+              </button>
+            </div>
           </div>
         </nav>
 
-        {/* Hero - Desktop */}
-        <div className="hidden md:flex flex-1 flex-col items-center justify-center px-6 pt-[7.3rem] pb-16 relative z-10">
+        {/* ══════════════════════════════════════════
+            HERO — full viewport height
+        ══════════════════════════════════════════ */}
+        <section className="relative z-10 flex flex-col items-center justify-center min-h-screen px-5 pt-14">
+          {/* Eyebrow badge */}
           <motion.div
-            initial="hidden"
-            animate="visible"
-            className="text-center mb-10 max-w-4xl mx-auto"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.45, ease }}
+            className="mb-7"
           >
-            <motion.h1
-              variants={fadeUp}
-              custom={0.1}
-              className="text-6xl md:text-7xl font-black tracking-tight text-black dark:text-white leading-[1.05] mb-4"
-              style={{ fontFamily: "'Syne', sans-serif" }}
-            >
-              Start with a sentence.
-            </motion.h1>
-
-            <motion.h2
-              variants={fadeUp}
-              custom={0.2}
-              className="text-6xl md:text-7xl font-black tracking-tight leading-[1.05] relative"
-              style={{ fontFamily: "'Syne', sans-serif" }}
-            >
-              <span className="bg-gradient-to-r from-purple-300 via-purple-400 to-purple-500 bg-clip-text text-transparent">
-                End with a website.
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-purple-500/25 bg-purple-500/[0.08]">
+              <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+              <span className="text-xs font-medium text-purple-300 tracking-wide">
+                AI-powered website builder
               </span>
-            </motion.h2>
-
-            <motion.p
-              variants={fadeUp}
-              custom={0.3}
-              className="text-neutral-600 dark:text-neutral-400 text-xl mt-7 mb-2 leading-relaxed max-w-2xl mx-auto"
-            >
-              Create stunning websites by chatting with Zap.
-            </motion.p>
-            <motion.p
-              variants={fadeUp}
-              custom={0.38}
-              className="text-neutral-500 dark:text-neutral-500 text-base max-w-xl mx-auto"
-            >
-              No code required. Just describe what you want and watch it come to life.
-            </motion.p>
+            </div>
           </motion.div>
 
-          {/* Input box */}
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.06, ease }}
+            className="text-center font-bold tracking-[-0.03em] leading-[1.07] mb-5 max-w-2xl"
+            style={{ fontSize: "clamp(2.4rem, 5.5vw, 4rem)" }}
+          >
+            Build websites with{" "}
+            <span className="bg-gradient-to-r from-purple-300 via-violet-300 to-purple-400 bg-clip-text text-transparent">
+              just words.
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15, ease }}
+            className="text-neutral-400 text-[1.05rem] text-center leading-relaxed max-w-md mb-10"
+          >
+            Describe what you want. Zap turns your ideas into a real, fully styled website, no code needed.
+          </motion.p>
+
+          {/* Prompt input */}
           <motion.div
-            initial={{ opacity: 0, y: 32, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.24, ease }}
+            className="w-full max-w-2xl"
           >
             <div className="relative">
-              {/* Glow behind input */}
-              <div className="absolute -inset-px bg-gradient-to-r from-purple-500/40 via-purple-400/40 to-purple-600/40 rounded-2xl blur-xl opacity-50" />
-              <div className="relative bg-white/[0.05] backdrop-blur-2xl rounded-2xl border border-white/[0.1] overflow-hidden shadow-2xl shadow-neutral-200 dark:shadow-black/50 ring-1 ring-white/[0.05]">
+              <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-600/45 via-violet-500/35 to-purple-600/45 rounded-2xl blur-lg opacity-55" />
+              <div className="relative bg-white/[0.04] backdrop-blur-xl rounded-2xl border border-white/[0.09] overflow-hidden shadow-2xl shadow-black/60 ring-1 ring-white/[0.04]">
                 <PromptInputPanel
                   isPremium={false}
                   description={prompt}
@@ -192,164 +227,198 @@ export default function Landing() {
                   isSubmitting={false}
                   disabled={false}
                   placeholder="Describe the website you want to build..."
-                  textareaHeight="6rem"
-                  textareaMaxHeight="16rem"
+                  textareaHeight="5.5rem"
+                  textareaMaxHeight="14rem"
                   maxImages={10}
                   showSupportModal={false}
                 />
               </div>
             </div>
+          </motion.div>
 
-            {/* Feature chips */}
+          {/* Scroll hint */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
+          >
+            <span className="text-[11px] text-neutral-600 tracking-widest uppercase">Explore</span>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.5 }}
-              className="flex items-center justify-center gap-6 mt-6"
+              animate={{ y: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
             >
+              <svg className="w-4 h-4 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 9l-7 7-7-7" />
+              </svg>
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ══════════════════════════════════════════
+            FEATURES GRID
+        ══════════════════════════════════════════ */}
+        <section className="relative z-10 py-28 px-5">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400 mb-3">
+                Everything you need
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-[-0.025em] text-white">
+                A complete toolkit, zero setup
+              </h2>
+              <p className="mt-4 text-neutral-500 max-w-md mx-auto text-[0.95rem] leading-relaxed">
+                Zap bundles every tool you need to go from idea to deployed site, in one place.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.06] rounded-2xl overflow-hidden border border-white/[0.06]">
               {FEATURES.map((f, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-black dark:text-neutral-500">
-                  <span className="text-purple-400">{f.icon}</span>
-                  <span>{f.label}</span>
+                <div
+                  key={i}
+                  className="group relative bg-[#06060f] p-7 hover:bg-white/[0.025] transition-colors duration-300"
+                >
+                  <div className="absolute top-0 left-7 right-7 h-px bg-gradient-to-r from-transparent via-purple-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="w-9 h-9 rounded-xl border border-white/[0.08] bg-white/[0.04] flex items-center justify-center text-purple-300 mb-4 group-hover:border-purple-500/30 group-hover:bg-purple-500/[0.08] transition-colors duration-300">
+                    {f.icon}
+                  </div>
+                  <h3 className="text-[0.95rem] font-semibold text-white mb-2">{f.title}</h3>
+                  <p className="text-[0.85rem] text-neutral-500 leading-relaxed">{f.description}</p>
                 </div>
               ))}
-            </motion.div>
-          </motion.div>
-        </div>
-
-        {/* Hero - Mobile */}
-        <div className="md:hidden flex flex-col min-h-full relative z-10">
-          <div className="flex-1 px-5 pt-56 pb-6">
-            <motion.div initial="hidden" animate="visible" className="text-center mb-8 max-w-2xl mx-auto">
-
-              <motion.h1
-                variants={fadeUp}
-                custom={0.1}
-                className="text-[2rem] font-black tracking-tight text-black dark:text-white leading-tight"
-                style={{ fontFamily: "'Syne', sans-serif" }}
-              >
-                Start with a sentence.
-              </motion.h1>
-              <motion.h2
-                variants={fadeUp}
-                custom={0.2}
-                className="text-[2rem] font-black bg-gradient-to-r from-purple-300 via-purple-400 to-purple-500 bg-clip-text text-transparent mt-1 leading-tight"
-                style={{ fontFamily: "'Syne', sans-serif" }}
-              >
-                End with a website.
-              </motion.h2>
-            </motion.div>
-
-            <motion.p variants={fadeUp} custom={0.3} initial="hidden" animate="visible" className="text-neutral-400 text-center mb-2 text-sm leading-relaxed max-w-md mx-auto">
-              Create stunning websites by chatting with Zap.
-            </motion.p>
-            <motion.p variants={fadeUp} custom={0.38} initial="hidden" animate="visible" className="text-neutral-500 text-center text-xs max-w-sm mx-auto mb-10">
-              No code required. Just describe what you want.
-            </motion.p>
+            </div>
           </div>
+        </section>
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="px-4 pb-4"
-          >
-            <div className="relative">
-              <div className="absolute -inset-px bg-gradient-to-r from-purple-500/40 via-purple-400/30 to-purple-600/40 rounded-2xl blur-xl opacity-40" />
-              <div className="relative bg-white/[0.05] backdrop-blur-2xl rounded-2xl border border-white/[0.1] overflow-hidden shadow-2xl shadow-neutral-200 dark:shadow-black/50">
-                <PromptInputPanel
-                  isPremium={false}
-                  description={prompt}
-                  setDescription={setPrompt}
-                  onSubmit={handleSubmit}
-                  isSubmitting={false}
-                  disabled={false}
-                  placeholder="Describe the website you want to build..."
-                  textareaHeight="4rem"
-                  textareaMaxHeight="12rem"
-                  maxImages={10}
-                  showSupportModal={false}
-                  // textareaClassName="text-lg"
-                />
-              </div>
+        {/* ══════════════════════════════════════════
+            HOW IT WORKS
+        ══════════════════════════════════════════ */}
+        <section className="relative z-10 py-24 px-5 border-t border-white/[0.05]">
+          <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-purple-700/10 rounded-full blur-[100px]" />
+          <div className="max-w-6xl mx-auto relative">
+            <div className="text-center mb-16">
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400 mb-3">
+                How it works
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-[-0.025em] text-white">
+                From idea to site in minutes
+              </h2>
             </div>
-          </motion.div>
 
-          {/* Footer mobile */}
-          <footer className="border-t bg-white/70 border-neutral-200 dark:border-white/[0.06] dark:bg-black/20 backdrop-blur-xl mt-4">
-            <div className="px-4 py-8">
-              <div className="flex flex-col items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-400 to-purple-700 flex items-center justify-center">
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {STEPS.map((s, i) => (
+                <div key={i} className="relative">
+                  {i < STEPS.length - 1 && (
+                    <div className="hidden lg:block absolute top-6 left-[calc(100%_-_12px)] w-[calc(100%_-_24px)] h-px bg-gradient-to-r from-white/10 to-transparent z-10" />
+                  )}
+                  <div className="bg-white/[0.03] border border-white/[0.07] rounded-2xl p-6 h-full hover:border-purple-500/25 hover:bg-white/[0.05] transition-all duration-300">
+                    <span className="text-[0.7rem] font-bold tracking-[0.18em] text-purple-500/70 uppercase">
+                      {s.number}
+                    </span>
+                    <h3 className="text-[0.95rem] font-semibold text-white mt-3 mb-2">{s.title}</h3>
+                    <p className="text-[0.83rem] text-neutral-500 leading-relaxed">{s.body}</p>
                   </div>
-                  <span className="text-base font-bold text-black dark:text-white tracking-tight">Zap</span>
                 </div>
-                <p className="text-xs text-neutral-600">© 2026 Zap. All rights reserved.</p>
-                <div className="flex items-center gap-8">
-                  <a href="/policies" className="text-sm font-medium text-black hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-white transition-colors duration-200">
-                    Policies
-                  </a>
-                  <a
-                    href="https://github.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-black hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-white transition-colors duration-200 flex items-center gap-2"
-                  >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
+              ))}
             </div>
-          </footer>
-        </div>
+          </div>
+        </section>
 
-        {/* Footer - Desktop */}
-        <footer className="hidden md:block relative z-10 border-t bg-white/70 border-neutral-200 dark:border-white/[0.06] dark:bg-black/20 backdrop-blur-xl mt-auto">
-          <div className="max-w-5xl mx-auto px-6 py-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-400 to-purple-700 flex items-center justify-center">
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <span className="text-base font-bold text-black dark:text-white tracking-tight">Zap</span>
-                </div>
-                <span className="dark:text-neutral-700">·</span>
-                <p className="text-sm text-black dark:text-neutral-600">© 2026 Zap. All rights reserved.</p>
-              </div>
-
-              <div className="flex items-center gap-8">
-                <a href="/policies" className="text-sm font-medium text-black hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-white transition-colors duration-200">
-                  Policies
-                </a>
-                <a
-                  href="https://github.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-black hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-white transition-colors duration-200 flex items-center gap-2"
+        {/* ══════════════════════════════════════════
+            TECH STACK STRIP
+        ══════════════════════════════════════════ */}
+        <section className="relative z-10 border-t border-white/[0.05] py-14 px-5">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-center text-[11px] font-semibold tracking-[0.22em] uppercase text-neutral-600 mb-8">
+              Built on
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
+              {["Next.js", "React", "WebContainer", "NextAuth.js", "Cloudinary", "Razorpay"].map((tech) => (
+                <span
+                  key={tech}
+                  className="text-[0.82rem] font-medium text-neutral-600 hover:text-neutral-300 transition-colors cursor-default"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════
+            CTA
+        ══════════════════════════════════════════ */}
+        <section className="relative z-10 py-28 px-5 border-t border-white/[0.05]">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="w-[600px] h-[300px] bg-purple-700/12 rounded-full blur-[120px]" />
+          </div>
+          <div className="max-w-2xl mx-auto text-center relative">
+            <h2 className="text-3xl md:text-[2.6rem] font-bold tracking-[-0.025em] leading-[1.1] mb-4">
+              Ready to build something{" "}
+              <span className="bg-gradient-to-r from-purple-300 via-violet-300 to-purple-400 bg-clip-text text-transparent">
+                extraordinary?
+              </span>
+            </h2>
+            <p className="text-neutral-500 text-[0.95rem] leading-relaxed mb-8">
+              Start for free. No credit card required. Your first project is just a description away.
+            </p>
+            <button
+              onClick={() => router.push("/signup")}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-neutral-900 text-sm font-semibold hover:bg-neutral-100 transition-all shadow-lg shadow-white/5"
+            >
+              Get started free
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════
+            FOOTER
+        ══════════════════════════════════════════ */}
+        <footer className="relative z-10 border-t border-white/[0.06] bg-black/20 backdrop-blur-xl">
+          <div className="max-w-6xl mx-auto px-5 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-md bg-gradient-to-br from-purple-400 to-violet-700 flex items-center justify-center">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  <span>GitHub</span>
-                </a>
+                </div>
+                <span className="text-sm font-semibold tracking-tight">Zap</span>
               </div>
+              <span className="text-neutral-700 hidden md:inline">·</span>
+              <p className="text-xs text-neutral-600 hidden md:inline">© 2026 Zap. All rights reserved.</p>
+            </div>
+            <p className="text-xs text-neutral-600 md:hidden">© 2026 Zap. All rights reserved.</p>
+            <div className="flex items-center gap-6 text-[13px]">
+              <a href="/policies" className="text-neutral-500 hover:text-white transition-colors">
+                Policies
+              </a>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-neutral-500 hover:text-white transition-colors flex items-center gap-1.5"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    fillRule="evenodd"
+                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                GitHub
+              </a>
             </div>
           </div>
         </footer>
 
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
-        {/* Google Font import */}
         <style jsx global>{`
-          @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap');
         `}</style>
       </main>
     </>

@@ -38,7 +38,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Providers>
-            <div className="overflow-y-hidden h-screen">
+            <div>
               <WebContainerManager />
               {children}
             </div>
