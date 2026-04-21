@@ -33,22 +33,6 @@ export function Profile() {
     router.push("/chat")
   }
 
-  useEffect(() => {
-    const threshold = 25
-    const sidebarWidth = 256
-
-    const onMouseMove = (e: MouseEvent) => {
-      const isNearRightEdge = window.innerWidth - e.clientX <= threshold
-      const isInsideSidebar = e.clientX >= window.innerWidth - sidebarWidth
-
-      if (isNearRightEdge) setIsHovered(true)
-      else if (!isInsideSidebar && isHovered) setIsHovered(false)
-    }
-
-    document.addEventListener("mousemove", onMouseMove)
-    return () => document.removeEventListener("mousemove", onMouseMove)
-  }, [isHovered])
-
   const handleSidebarMouseLeave = () => setIsHovered(false)
   const handleSidebarClose = () => { setIsOpen(false); setIsHovered(false) }
   const sidebarVisible = isOpen || isHovered

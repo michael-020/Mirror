@@ -84,22 +84,6 @@ export function ProjectInitializer() {
     if (!session) redirect("/")
   }, [session, status])
 
-  useEffect(() => {
-    const threshold = 25
-    const sidebarWidth = 256
-
-    const onMouseMove = (e: MouseEvent) => {
-      const nearEdge = window.innerWidth - e.clientX <= threshold
-      const insideSidebar = e.clientX >= window.innerWidth - sidebarWidth
-
-      if (nearEdge) setIsHovered(true)
-      else if (!insideSidebar) setIsHovered(false)
-    }
-
-    document.addEventListener("mousemove", onMouseMove)
-    return () => document.removeEventListener("mousemove", onMouseMove)
-  }, [])
-
   const sidebarVisible = isOpen || isHovered
 
   const handleSubmit = async (promptText: string, files: File[]) => {

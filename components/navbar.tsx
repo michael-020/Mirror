@@ -23,7 +23,7 @@ export default function Navbar({
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-black/80 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800">
-      <div className="flex items-center justify-between px-6 py-3">
+      <div className="max-w-6xl mx-auto px-5 flex items-center justify-between h-14">
         <div className="flex items-center gap-3">
           {showBackButton ? (
             <button

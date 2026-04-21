@@ -2,6 +2,7 @@
 
 import Navbar from "@/components/navbar"
 import RightSidebar from "@/components/sidebar"
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 
@@ -20,23 +21,14 @@ const PoliciesPage = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [activeSection, setActiveSection] = useState("terms")
+  const { data: session } = useSession()
 
-  const onBackHandler = () => router.push("/chat")
-
-  useEffect(() => {
-    const threshold = 25
-    const sidebarWidth = 256
-
-    const onMouseMove = (e: MouseEvent) => {
-      const isNearRightEdge = window.innerWidth - e.clientX <= threshold
-      const isInsideSidebar = e.clientX >= window.innerWidth - sidebarWidth
-      if (isNearRightEdge) setIsHovered(true)
-      else if (!isInsideSidebar && isHovered) setIsHovered(false)
-    }
-
-    document.addEventListener("mousemove", onMouseMove)
-    return () => document.removeEventListener("mousemove", onMouseMove)
-  }, [isHovered])
+  const onBackHandler = () =>{
+    if(session?.user)
+      router.push("/chat")
+    else 
+      router.push("/")
+  }
 
   // Intersection observer to highlight active section in index
   useEffect(() => {
