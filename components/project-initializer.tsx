@@ -11,7 +11,7 @@ import Navbar from "./navbar"
 import { axiosInstance } from "@/lib/axios"
 import { PromptInputPanel } from "./prompt-input-panel"
 import { showErrorToast } from "@/lib/toast"
-import { motion } from "framer-motion"
+import { cubicBezier, motion } from "framer-motion"
 import { UserTier } from "@prisma/client"
 
 const fadeUp = {
@@ -22,6 +22,8 @@ const fadeUp = {
     transition: { duration: 0.55, ease: "easeOut" as const, delay },
   }),
 }
+
+const ease = cubicBezier(0.16, 1, 0.3, 1);
 
 export function ProjectInitializer() {
   const {
@@ -152,33 +154,28 @@ export function ProjectInitializer() {
             <motion.div
               initial="hidden"
               animate="visible"
-              className="text-center space-y-3 sm:space-y-4"
+              className="text-center space-y-6 sm:space-y-8 mx-auto"
             >
 
               <motion.h1
-                variants={fadeUp}
-                custom={0.1}
-                className="text-3xl sm:text-3xl md:text-5xl font-black text-black dark:text-white leading-snug sm:leading-tight"
-                style={{ fontFamily: "'Syne', sans-serif" }}
+                initial={{ opacity: 0, y: 22 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.06, ease }}
+                className="text-center font-bold tracking-[-0.03em] leading-[1.07] mb-5 max-w-2xl mx-auto"
+                style={{ fontSize: "clamp(2.4rem, 5.5vw, 4rem)" }}
               >
-                Start with a sentence.
+                Build websites with{" "}
+                <span className="bg-gradient-to-r from-purple-300 via-violet-300 to-purple-400 bg-clip-text text-transparent">
+                  just words.
+                </span>
               </motion.h1>
-
-              <motion.h2
-                variants={fadeUp}
-                custom={0.2}
-                className="text-3xl sm:text-3xl md:text-5xl font-black bg-gradient-to-r from-purple-300 via-purple-400 to-purple-500 bg-clip-text text-transparent leading-snug sm:leading-tight"
-                style={{ fontFamily: "'Syne', sans-serif" }}
-              >
-                End with a website.
-              </motion.h2>
 
               <motion.p
                 variants={fadeUp}
-                custom={0.3}
-                className="text-[0.9rem] sm:text-base md:text-lg text-neutral-800 dark:text-neutral-400 max-w-md sm:max-w-xl mx-auto pt-3"
+                custom={0.2}
+                className="text-neutral-600 dark:text-neutral-400 text-[1.05rem] text-center leading-relaxed max-w-md mx-auto"
               >
-                Create stunning websites by chatting with Zap.
+                Describe what you want. Zap turns your ideas into a real, fully styled website, no code needed.
               </motion.p>
             </motion.div>
 
@@ -186,12 +183,12 @@ export function ProjectInitializer() {
               initial={{ opacity: 0, y: 28, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.65, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed bottom-0 left-0 right-0 z-50 px-4 md:static md:px-0 md:py-0 md:mt-6"
+              className="fixed bottom-0 left-0 right-0 z-50 px-4 md:static md:px-0 md:py-0 md:mt-6 mx-auto"
             >
               {/* Mobile bg fade */}
               <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#080810] to-transparent md:hidden pointer-events-none" />
 
-              <div className="relative md:block">
+              <div className="relative md:block max-w-2xl mx-auto">
 
                   <PromptInputPanel
                     isPremium={isPro}
@@ -225,7 +222,7 @@ export function ProjectInitializer() {
       />
 
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
       `}</style>
     </div>
   )

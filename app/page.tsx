@@ -88,8 +88,8 @@ const STEPS = [
   {
     number: "04",
     title: "Ship it",
-    body: "Export your project or deploy directly. Your site is ready for the world.",
-  },
+    body: "Download your project and deploy it anywhere you like. Your site is ready for the world.",
+  }
 ];
 
 export default function Landing() {
@@ -117,11 +117,11 @@ export default function Landing() {
   return (
     <>
       <main
-        className="bg-[#06060f] text-white flex flex-col relative overflow-auto custom-scrollbar"
+        className="bg-[#06060f] text-white flex flex-col relative max-h-screen overflow-auto scrollbar-hidden"
         style={{ fontFamily: "'DM Sans', sans-serif" }}
       >
         {/* ── Global ambient background ── */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="pointer-events-none fixed inset-0">
           <div className="absolute top-[-15%] left-1/2 -translate-x-1/2 w-[800px] h-[560px] bg-purple-700/18 rounded-full blur-[140px]" />
           <div className="absolute top-[30%] left-[-8%] w-[420px] h-[420px] bg-purple-900/12 rounded-full blur-[110px]" />
           <div className="absolute top-[20%] right-[-8%] w-[360px] h-[360px] bg-violet-800/10 rounded-full blur-[110px]" />
@@ -140,7 +140,7 @@ export default function Landing() {
         ══════════════════════════════════════════ */}
         <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.07] bg-[#06060f]/80 backdrop-blur-xl">
           <div className="max-w-6xl mx-auto px-5 flex items-center justify-between h-14">
-            <div className="text-neutral-900 dark:text-white font-bold font-stretch-extra-expanded text-xl tracking-wide select-none">
+            <div className="text-neutral-900 dark:text-white font-bold font-stretch-extra-expanded text-base sm:text-xl tracking-wide select-none">
               <div className='flex items-center justify-center gap-2'>
                 <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-400 to-purple-700 flex items-center justify-center">
                   <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,12 +178,12 @@ export default function Landing() {
             transition={{ duration: 0.45, ease }}
             className="mb-7"
           >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-purple-500/25 bg-purple-500/[0.08]">
+            {/* <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-purple-500/25 bg-purple-500/[0.08]">
               <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
               <span className="text-xs font-medium text-purple-300 tracking-wide">
                 AI-powered website builder
               </span>
-            </div>
+            </div> */}
           </motion.div>
 
           {/* Headline */}
@@ -218,7 +218,7 @@ export default function Landing() {
           >
             <div className="relative">
               <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-600/45 via-violet-500/35 to-purple-600/45 rounded-2xl blur-lg opacity-55" />
-              <div className="relative bg-white/[0.04] backdrop-blur-xl rounded-2xl border border-white/[0.09] overflow-hidden shadow-2xl shadow-black/60 ring-1 ring-white/[0.04]">
+              <div className="relative bg-white/[0.04] backdrop-blur-xl rounded-2xl border border-white/[0.09] shadow-2xl shadow-black/60 ring-1 ring-white/[0.04]">
                 <PromptInputPanel
                   isPremium={false}
                   description={prompt}
@@ -272,7 +272,7 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.06] rounded-2xl overflow-hidden border border-white/[0.06]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/[0.06] rounded-2xl border border-white/[0.06]">
               {FEATURES.map((f, i) => (
                 <div
                   key={i}

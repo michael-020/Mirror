@@ -28,7 +28,7 @@ export default function Navbar({
           {showBackButton ? (
             <button
               onClick={onBack}
-              className="text-neutral-900 dark:text-white font-bold font-stretch-extra-expanded text-xl tracking-wide cursor-pointer select-none hover:opacity-90 transition"
+              className="text-neutral-900 dark:text-white font-bold text-xl tracking-wide cursor-pointer select-none hover:opacity-90 transition"
             >
               <div className='flex items-center justify-center gap-2'>
                 <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-400 to-purple-700 flex items-center justify-center">
@@ -40,7 +40,7 @@ export default function Navbar({
               </div>
             </button>
           ) : (
-            <div className="text-neutral-900 dark:text-white font-bold font-stretch-extra-expanded text-xl tracking-wide select-none">
+            <div className="text-neutral-900 dark:text-white font-bold text-xl tracking-wide select-none">
               <div className='flex items-center justify-center gap-2'>
                 <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-400 to-purple-700 flex items-center justify-center">
                   <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
